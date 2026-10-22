@@ -139,8 +139,8 @@ export const eventConfig: EventConfig = {
   soldOutBadge: 'A Member of the Soldout Family of Churches',
   aboutChurch:
     'Welcome to the Metro Manila International Christian Church. We are part of a worldwide movement of sold-out disciples with the vision to evangelize the nations in this generation.',
-  logo: '/images/micc-logo.png',
-  logoAlt: 'Manila International Christian Church logo',
+  logo: '/images/mnl-logo.png',
+  logoAlt: 'Manila International Christian Church MNL logo',
 
   // 3. EVENT DETAILS (Edit event title, date, time & venue here)
   eventTitle: 'Come as You Are',
@@ -278,7 +278,7 @@ export const eventConfig: EventConfig = {
   seo: {
     title: "You're invited to Lilok Bible Talk | MICC Central Region",
     description: "You're warmly invited to Lilok Bible Talk! Friendly community, open Bible discussion, uplifting message, and food & fellowship. Manila International Christian Church (MICC) Central Region. Welcome to the family.",
-    ogImage: '/images/micc-logo.png',
+    ogImage: '/images/mnl-logo.png',
     canonicalUrl: 'https://micc.church'
   }
 }

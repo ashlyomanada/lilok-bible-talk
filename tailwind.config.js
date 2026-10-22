@@ -12,99 +12,117 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        serif: ['"Playfair Display"', '"Cormorant Garamond"', 'Georgia', 'serif'],
-        sans: ['"Plus Jakarta Sans"', 'Inter', 'system-ui', '-apple-system', 'sans-serif'],
-        script: ['"Great Vibes"', '"Dancing Script"', 'cursive']
+        sans: ['"Outfit"', '"Plus Jakarta Sans"', 'Inter', 'system-ui', '-apple-system', 'sans-serif'],
+        display: ['"Outfit"', '"Plus Jakarta Sans"', 'sans-serif']
       },
       colors: {
-        // Deep Navy palette
+        // Theme Colors matching MICC "MNL" logo
+        brand: {
+          navy: '#0F1B26',      // Ink navy (primary dark)
+          gray: '#D9D9D9',      // Soft gray (light surfaces)
+          offwhite: '#F4F4F2',  // Off-white (cards & page bg)
+          gold: '#F2B544',      // Sunrise gold accent
+          goldHover: '#DE9F2D',
+          coral: '#FF6B4A'       // Warm coral accent
+        },
         navy: {
-          50: '#F2F5FC',
-          100: '#E5EDF9',
-          200: '#CADAF3',
-          300: '#9FBCE9',
-          400: '#6D99DC',
-          500: '#4677CC',
-          600: '#2F59AC',
-          700: '#234488',
-          800: '#1B3468',
-          850: '#142750',
-          900: '#0D1A38',
-          950: '#070D1E'
+          50: '#F2F5F8',
+          100: '#E4EAF0',
+          200: '#C8D5E1',
+          300: '#9BB4C9',
+          400: '#688EAC',
+          500: '#436B8C',
+          600: '#2D4E6D',
+          700: '#203952',
+          800: '#17283A',
+          850: '#12202E',
+          900: '#0F1B26',      // Primary Ink Navy
+          950: '#091017'       // Ultra Dark Navy
         },
-        // Warm Cream palette
-        cream: {
-          50: '#FDFCF8',
-          100: '#FAF6EE',
-          200: '#F4ECE0',
-          300: '#EBDDC9',
-          400: '#DCC7A7',
-          500: '#C7AD86'
+        surface: {
+          50: '#FAFAF9',
+          100: '#F4F4F2',     // Primary Off-white
+          200: '#EAEAE7',
+          300: '#D9D9D9',     // Soft Gray
+          400: '#BFBFBC',
+          500: '#959591',
+          600: '#6B6B67',
+          700: '#4A4A46',
+          800: '#2B2B28',
+          900: '#181816'
         },
-        // Soft Gold palette
-        gold: {
-          50: '#FFFDF5',
-          100: '#FEF9E3',
-          200: '#FDF0BD',
-          300: '#FCE38F',
-          400: '#F7CE51',
-          500: '#E8B323',
-          600: '#C59012',
-          700: '#9B6E0B',
-          800: '#7B540E',
-          900: '#4E3408'
+        accent: {
+          50: '#FEF9EE',
+          100: '#FDF1D5',
+          200: '#FBE2A9',
+          300: '#F8CF75',
+          400: '#F5BE47',
+          500: '#F2B544',     // Primary Sunrise Gold
+          600: '#DE9F2D',
+          700: '#BA7C1B',
+          800: '#955F18',
+          900: '#794D18'
         },
-        // Sunrise Coral palette
         coral: {
           50: '#FFF5F2',
-          100: '#FFE8E1',
-          200: '#FFD3C6',
-          300: '#FFAE99',
-          400: '#FF8A6E',
-          500: '#FF6442',
-          600: '#E64622',
-          700: '#BA3314'
+          100: '#FFE7E1',
+          200: '#FFD3C7',
+          300: '#FFB3A1',
+          400: '#FF886E',
+          500: '#FF6B4A',     // Warm Coral
+          600: '#E84D29',
+          700: '#C43615',
+          800: '#A12D13',
+          900: '#832A15'
         },
-        // Backwards compatibility aliases
-        ivory: {
-          50: '#FDFCF8',
-          100: '#FAF6EE',
-          200: '#F4ECE0',
-          300: '#EBDDC9',
-          400: '#DCC7A7'
+        // Aliases for compatibility
+        cream: {
+          50: '#FDFCFB',
+          100: '#F4F4F2',
+          200: '#EAEAE7',
+          300: '#D9D9D9',
+          400: '#BFBFBC',
+          500: '#959591'
         },
-        amberGold: {
-          50: '#FFFDF5',
-          100: '#FEF9E3',
-          200: '#FDF0BD',
-          300: '#FCE38F',
-          400: '#F7CE51',
-          500: '#E8B323',
-          600: '#C59012',
-          700: '#9B6E0B',
-          800: '#7B540E'
+        gold: {
+          50: '#FEF9EE',
+          100: '#FDF1D5',
+          200: '#FBE2A9',
+          300: '#F8CF75',
+          400: '#F5BE47',
+          500: '#F2B544',
+          600: '#DE9F2D',
+          700: '#BA7C1B',
+          800: '#955F18',
+          900: '#794D18'
         },
         warmStone: {
-          50: '#FAF8F5',
-          100: '#F3EFEA',
-          200: '#E5DFD7',
-          300: '#CFC5B8',
-          400: '#A39583',
-          500: '#7D7060',
-          600: '#5F5345',
-          700: '#463B30',
-          800: '#2F261E',
-          900: '#1C150E',
-          950: '#0F0B07'
+          50: '#FAFAF9',
+          100: '#F4F4F2',
+          200: '#EAEAE7',
+          300: '#D9D9D9',
+          400: '#BFBFBC',
+          500: '#959591',
+          600: '#6B6B67',
+          700: '#4A4A46',
+          800: '#2B2B28',
+          900: '#0F1B26'
         }
       },
+      borderRadius: {
+        '2xl': '1rem',
+        '3xl': '1.5rem',
+        '4xl': '2rem',
+        '5xl': '2.5rem'
+      },
       boxShadow: {
-        'warm-sm': '0 2px 8px -2px rgba(13, 26, 56, 0.06), 0 1px 4px -1px rgba(0, 0, 0, 0.04)',
-        'warm': '0 8px 24px -4px rgba(13, 26, 56, 0.08), 0 4px 12px -2px rgba(0, 0, 0, 0.04)',
-        'warm-lg': '0 16px 36px -6px rgba(13, 26, 56, 0.12), 0 8px 16px -4px rgba(0, 0, 0, 0.05)',
-        'warm-xl': '0 24px 50px -12px rgba(13, 26, 56, 0.16), 0 12px 24px -6px rgba(0, 0, 0, 0.06)',
-        'glow': '0 0 40px -8px rgba(232, 179, 35, 0.35)',
-        'card': '0 20px 60px -15px rgba(13, 26, 56, 0.25), 0 0 1px 1px rgba(255, 255, 255, 0.15) inset'
+        'soft-sm': '0 2px 8px -2px rgba(15, 27, 38, 0.05)',
+        'soft': '0 8px 24px -4px rgba(15, 27, 38, 0.08), 0 4px 12px -2px rgba(15, 27, 38, 0.04)',
+        'soft-lg': '0 16px 36px -6px rgba(15, 27, 38, 0.12), 0 8px 16px -4px rgba(15, 27, 38, 0.06)',
+        'soft-xl': '0 24px 56px -10px rgba(15, 27, 38, 0.20)',
+        'glow-gold': '0 0 35px -5px rgba(242, 181, 68, 0.35)',
+        'glow-accent': '0 0 45px -5px rgba(242, 181, 68, 0.45)',
+        'dark-card': '0 20px 60px -15px rgba(0, 0, 0, 0.4), 0 0 1px 1px rgba(255, 255, 255, 0.1) inset'
       }
     }
   },

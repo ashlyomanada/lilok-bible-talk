@@ -24,7 +24,7 @@ export default defineNuxtConfig({
         { charset: 'utf-8' },
         { name: 'viewport', content: 'width=device-width, initial-scale=1, viewport-fit=cover' },
         { name: 'description', content: eventConfig.seo.description },
-        { name: 'theme-color', content: '#0D182E' },
+        { name: 'theme-color', content: '#0F1B26' },
 
         // Open Graph / Facebook / Messenger
         { property: 'og:type', content: 'website' },
@@ -40,7 +40,8 @@ export default defineNuxtConfig({
         { name: 'twitter:image', content: eventConfig.seo.ogImage }
       ],
       link: [
-        { rel: 'icon', type: 'image/png', href: '/images/micc-logo.png' },
+        { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' },
+        { rel: 'icon', type: 'image/png', href: '/images/mnl-logo.png' },
         { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
         { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' }
       ]

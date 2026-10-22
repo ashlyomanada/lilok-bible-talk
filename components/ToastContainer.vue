@@ -5,7 +5,7 @@ const { toasts, removeToast } = useToast()
 </script>
 
 <template>
-  <div class="fixed bottom-6 right-4 sm:right-6 z-50 flex flex-col gap-2 max-w-sm pointer-events-none" aria-live="polite">
+  <div class="fixed bottom-20 md:bottom-6 right-4 sm:right-6 z-50 flex flex-col gap-2 max-w-sm pointer-events-none" aria-live="polite">
     <TransitionGroup
       enter-active-class="transform transition ease-out duration-300"
       enter-from-class="translate-y-4 opacity-0 scale-95"
@@ -17,28 +17,29 @@ const { toasts, removeToast } = useToast()
       <div
         v-for="toast in toasts"
         :key="toast.id"
-        class="pointer-events-auto flex items-center justify-between gap-3 px-4 py-3 rounded-2xl shadow-warm-lg border text-sm font-medium backdrop-blur-md"
+        class="pointer-events-auto flex items-center justify-between gap-3 px-4 py-3 rounded-2xl shadow-soft-xl border text-sm font-semibold backdrop-blur-xl transition-all"
         :class="[
           toast.type === 'success'
-            ? 'bg-amberGold-50/95 border-amberGold-300 text-warmStone-800'
+            ? 'bg-navy-900/95 border-accent-500/40 text-white'
             : toast.type === 'warning'
-            ? 'bg-amber-50/95 border-amber-300 text-amber-900'
-            : 'bg-white/95 border-warmStone-200 text-warmStone-800'
+            ? 'bg-coral-900/95 border-coral-500/40 text-white'
+            : 'bg-navy-900/95 border-white/20 text-white'
         ]"
       >
         <div class="flex items-center gap-2.5">
-          <span v-if="toast.type === 'success'" class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-          <span v-else class="w-2 h-2 rounded-full bg-amberGold-500 animate-pulse"></span>
+          <span v-if="toast.type === 'success'" class="w-2 h-2 rounded-full bg-accent-400 animate-pulse"></span>
+          <span v-else-if="toast.type === 'warning'" class="w-2 h-2 rounded-full bg-coral-400 animate-pulse"></span>
+          <span v-else class="w-2 h-2 rounded-full bg-white animate-pulse"></span>
           <span>{{ toast.text }}</span>
         </div>
         <button
           type="button"
-          class="text-warmStone-400 hover:text-warmStone-600 p-1 rounded-lg transition-colors"
+          class="text-surface-400 hover:text-white p-1 rounded-lg transition-colors ml-2"
           aria-label="Dismiss toast"
           @click="removeToast(toast.id)"
         >
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>
           </svg>
         </button>
       </div>
