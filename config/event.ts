@@ -5,7 +5,68 @@
  * Central configuration file for the Lilok Bible Talk invitation website.
  * Update any event details, venues, dates, or contact links below.
  * Everything on the site updates automatically from this file.
+ *
+ * SCHEDULE: Lilok Bible Talk happens EVERY THURSDAY at 7:00 PM (Manila time).
+ * The next session date is computed automatically via getNextSession().
+ * To change the day, time, or length, edit SCHEDULE below.
  */
+
+// -----------------------------------------------------------------------------
+// RECURRING SCHEDULE HELPERS
+// -----------------------------------------------------------------------------
+
+const MANILA_OFFSET_MS = 8 * 60 * 60 * 1000 // Asia/Manila is UTC+8, no DST
+const WEEKDAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+const MONTHS = [
+  'January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December',
+]
+const pad = (n: number) => String(n).padStart(2, '0')
+
+export const SCHEDULE = {
+  dayOfWeek: 4, // 0 = Sunday ... 4 = Thursday
+  hour: 19, // 7:00 PM
+  minute: 0,
+  durationMinutes: 180, // 7:00 PM – 10:00 PM
+}
+
+const toManilaISO = (d: Date) =>
+  `${d.getUTCFullYear()}-${pad(d.getUTCMonth() + 1)}-${pad(d.getUTCDate())}T${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())}:00+08:00`
+
+/**
+ * Next Thursday session in Manila time.
+ * Rolls over to the following week once the current session has ended.
+ */
+export function getNextSession(now: Date = new Date()) {
+  const manilaNow = new Date(now.getTime() + MANILA_OFFSET_MS)
+
+  const start = new Date(
+    Date.UTC(
+      manilaNow.getUTCFullYear(),
+      manilaNow.getUTCMonth(),
+      manilaNow.getUTCDate(),
+      SCHEDULE.hour,
+      SCHEDULE.minute,
+    ),
+  )
+  start.setUTCDate(start.getUTCDate() + ((SCHEDULE.dayOfWeek - manilaNow.getUTCDay() + 7) % 7))
+
+  let end = new Date(start.getTime() + SCHEDULE.durationMinutes * 60000)
+  if (end.getTime() <= manilaNow.getTime()) {
+    start.setUTCDate(start.getUTCDate() + 7)
+    end = new Date(start.getTime() + SCHEDULE.durationMinutes * 60000)
+  }
+
+  return {
+    startISO: toManilaISO(start),
+    endISO: toManilaISO(end),
+    dateLabel: `${WEEKDAYS[start.getUTCDay()]}, ${MONTHS[start.getUTCMonth()]} ${start.getUTCDate()}, ${start.getUTCFullYear()}`,
+  }
+}
+
+// -----------------------------------------------------------------------------
+// TYPES
+// -----------------------------------------------------------------------------
 
 export interface VenueInfo {
   name: string
@@ -48,11 +109,12 @@ export interface EventConfig {
   noPressureLine: string
   reassuranceChips: string[]
 
-  date: string
+  recurrenceLabel: string // e.g. "Every Thursday"
+  date: string // Next upcoming session date (computed)
   time: string
   formattedDateTime: string
   doorsOpenTime: string
-  countdownTargetISO: string // Client-side countdown (YYYY-MM-DDTHH:mm:ss)
+  countdownTargetISO: string // Next session start, with +08:00 offset (computed)
 
   venue: VenueInfo
 
@@ -83,6 +145,7 @@ export interface EventConfig {
   // Sunday Service
   sundayService: {
     dayAndTime: string
+    title: string
     message: string
     messengerUrl: string
     note: string
@@ -111,8 +174,9 @@ export interface EventConfig {
     title: string
     description: string
     location: string
-    startDateISO: string
-    endDateISO: string
+    startDateISO: string // Next session start (computed)
+    endDateISO: string // Next session end (computed)
+    recurrenceRule: string // iCal RRULE, e.g. FREQ=WEEKLY;BYDAY=TH
   }
 
   // SEO & Social share preview
@@ -142,7 +206,7 @@ export const eventConfig: EventConfig = {
   logo: '/images/mnl-logo.png',
   logoAlt: 'Manila International Christian Church MNL logo',
 
-  // 3. EVENT DETAILS (Edit event title, date, time & venue here)
+  // 3. EVENT DETAILS (Edit event title, time & venue here; schedule lives in SCHEDULE above)
   eventTitle: 'Come as You Are',
   eventSubtitle:
     'An open, heartwarming evening of real conversations, uplifting scripture, friendly community, and delicious treats.',
@@ -150,27 +214,33 @@ export const eventConfig: EventConfig = {
   noPressureLine: 'No pressure, just come as you are.',
   reassuranceChips: ['Free', 'All are welcome', 'Bring a friend', 'Come as you are'],
 
-  // Upcoming Event Date & Time (Placeholders: update with your next scheduled session)
-  date: 'Friday, November 20, 2026',
-  time: '7:30 PM – 9:00 PM',
-  formattedDateTime: 'Friday, Nov 20, 2026 · 7:30 PM',
-  doorsOpenTime: '7:00 PM',
-  countdownTargetISO: '2026-11-20T19:30:00',
+  // Every Thursday at 7:00 PM (Manila time)
+  recurrenceLabel: 'Every Thursday',
+  get date() {
+    return getNextSession().dateLabel
+  },
+  time: '7:00 PM – 10:00 PM',
+  formattedDateTime: 'Every Thursday · 7:00 PM',
+  doorsOpenTime: '6:30 PM',
+  get countdownTargetISO() {
+    return getNextSession().startISO
+  },
 
   // Venue details (Placeholder: TBA / Central Region meetup spot)
   venue: {
-    name: 'Central Region Hub (TBA)',
+    name: 'YMCA Makati',
     room: 'Main Gathering Area',
     address: 'Bonifacio Global City / Makati area (Exact venue TBA)',
     cityStateZip: 'Metro Manila, Philippines',
     mapLink: 'https://maps.google.com/?q=Metro+Manila+Philippines',
-    notes: 'Location announced in our group chat and Instagram stories. Message @lilok.bt or chat with us on Messenger for exact landmark and parking directions!'
+    notes:
+      'Location announced in our group chat and Instagram stories. Message @lilok.bt or chat with us on Messenger for exact landmark and parking directions!',
   },
 
   speaker: {
     name: 'Lilok Bible Talk Leaders & Friends',
     title: 'Central Region Disciples',
-    bio: 'Young professionals, students, and disciple leaders sharing real stories of life transformation, faith, and unconditional family.'
+    bio: 'Young professionals, students, and disciple leaders sharing real stories of life transformation, faith, and unconditional family.',
   },
 
   // 4. SOCIAL & CONTACT LINKS
@@ -185,7 +255,7 @@ export const eventConfig: EventConfig = {
     youtubeHandle: '@ManilaICC',
     email: 'central@micc.church',
     phone: '+639000000000',
-    displayPhone: '+63 (TBA)'
+    displayPhone: '+63 (TBA)',
   },
 
   // 5. WHAT'S NEXT? CONNECT WITH US
@@ -206,23 +276,23 @@ export const eventConfig: EventConfig = {
         venueName: 'Central Makati Service (TBA)',
         address: 'Makati Central Business District, Metro Manila',
         status: 'TBA',
-        notes: 'Contact us via Messenger for current hall details and Sunday parking info.'
+        notes: 'Contact us via Messenger for current hall details and Sunday parking info.',
       },
       {
         city: 'Taguig / BGC',
         venueName: 'Taguig & BGC Fellowship (TBA)',
         address: 'Bonifacio Global City, Taguig, Metro Manila',
         status: 'TBA',
-        notes: 'Accessible by BGC Bus and ride-hailing services. Message for room number.'
+        notes: 'Accessible by BGC Bus and ride-hailing services. Message for room number.',
       },
       {
         city: 'Muntinlupa',
         venueName: 'Muntinlupa / Alabang Gathering (TBA)',
         address: 'Alabang, Muntinlupa City, Metro Manila',
         status: 'TBA',
-        notes: 'Serving South Metro Manila disciples and guests.'
-      }
-    ]
+        notes: 'Serving South Metro Manila disciples and guests.',
+      },
+    ],
   },
 
   // 7. WHAT TO EXPECT
@@ -230,31 +300,35 @@ export const eventConfig: EventConfig = {
     {
       id: 'message',
       title: 'Uplifting Message',
-      description: 'A practical, encouraging look at God’s Word tailored for everyday struggles, healing, and peace.',
+      description:
+        'A practical, encouraging look at God’s Word tailored for everyday struggles, healing, and peace.',
       icon: 'book-open',
-      badge: 'Biblical & Real'
+      badge: 'Biblical & Real',
     },
     {
       id: 'community',
       title: 'Friendly Community',
-      description: 'A warm, genuine brotherhood and sisterhood where everyone is treated like family from day one.',
+      description:
+        'A warm, genuine brotherhood and sisterhood where everyone is treated like family from day one.',
       icon: 'heart-handshake',
-      badge: 'Family Feel'
+      badge: 'Family Feel',
     },
     {
       id: 'discussion',
       title: 'Open Bible Discussion',
-      description: 'A relaxed space where questions, curiosities, and personal reflections are always valued and explored.',
+      description:
+        'A relaxed space where questions, curiosities, and personal reflections are always valued and explored.',
       icon: 'messages-square',
-      badge: 'Interactive'
+      badge: 'Interactive',
     },
     {
       id: 'fellowship',
       title: 'Food & Fellowship',
-      description: 'Great conversations, light bites, snacks, laughs, and new friendships after the talk.',
+      description:
+        'Great conversations, light bites, snacks, laughs, and new friendships after the talk.',
       icon: 'coffee',
-      badge: 'Free Treats'
-    }
+      badge: 'Free Treats',
+    },
   ],
 
   // 8. SCRIPTURE HIGHLIGHT
@@ -262,23 +336,32 @@ export const eventConfig: EventConfig = {
     text: '“Come to me, all you who are weary and burdened, and I will give you rest. Take my yoke upon you and learn from me, for I am gentle and humble in heart, and you will find rest for your souls.”',
     reference: 'Matthew 11:28–29',
     translation: 'NIV',
-    reflectionNote: 'No matter how heavy your week has been, you can find genuine rest, true brothers and sisters, and peace in Christ.'
+    reflectionNote:
+      'No matter how heavy your week has been, you can find genuine rest, true brothers and sisters, and peace in Christ.',
   },
 
-  // 9. CALENDAR DATA
+  // 9. CALENDAR DATA (weekly recurring event)
   calendar: {
     title: 'Lilok Bible Talk: Come as You Are (MICC Central Region)',
-    description: 'Join Lilok Bible Talk under MICC Central Region for an uplifting evening of scripture, open conversation, and genuine fellowship. Free and welcoming to all! Follow @lilok.bt on Instagram.',
-    location: 'Central Region, Metro Manila (Message @lilok.bt or https://m.me/manilaicc for exact venue)',
-    startDateISO: '2026-11-20T19:30:00',
-    endDateISO: '2026-11-20T21:00:00'
+    description:
+      'Join Lilok Bible Talk under MICC Central Region every Thursday for an uplifting evening of scripture, open conversation, and genuine fellowship. Free and welcoming to all! Follow @lilok.bt on Instagram.',
+    location:
+      'Central Region, Metro Manila (Message @lilok.bt or https://m.me/manilaicc for exact venue)',
+    get startDateISO() {
+      return getNextSession().startISO
+    },
+    get endDateISO() {
+      return getNextSession().endISO
+    },
+    recurrenceRule: 'FREQ=WEEKLY;BYDAY=TH',
   },
 
   // 10. SEO & SOCIAL PREVIEWS
   seo: {
     title: "You're invited to Lilok Bible Talk | MICC Central Region",
-    description: "You're warmly invited to Lilok Bible Talk! Friendly community, open Bible discussion, uplifting message, and food & fellowship. Manila International Christian Church (MICC) Central Region. Welcome to the family.",
+    description:
+      "You're warmly invited to Lilok Bible Talk every Thursday! Friendly community, open Bible discussion, uplifting message, and food & fellowship. Manila International Christian Church (MICC) Central Region. Welcome to the family.",
     ogImage: '/images/mnl-logo.png',
-    canonicalUrl: 'https://micc.church'
-  }
+    canonicalUrl: 'https://micc.church',
+  },
 }
