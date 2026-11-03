@@ -7,12 +7,27 @@ export default defineNuxtConfig({
   devtools: { enabled: false },
 
   modules: [
-    '@nuxtjs/tailwindcss'
+    '@nuxtjs/supabase',
+    '@nuxt/ui'
   ],
+
+  ui: {
+    fonts: false
+  },
+
+  supabase: {
+    redirect: false
+  },
 
   css: [
     '~/assets/css/main.css'
   ],
+
+  routeRules: {
+    '/': { swr: 60 },
+    '/admin/**': { ssr: false, headers: { 'X-Robots-Tag': 'noindex, nofollow' } },
+    '/api/**': { cors: true }
+  },
 
   app: {
     head: {
@@ -45,12 +60,6 @@ export default defineNuxtConfig({
         { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
         { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' }
       ]
-    }
-  },
-
-  nitro: {
-    prerender: {
-      routes: ['/']
     }
   }
 })

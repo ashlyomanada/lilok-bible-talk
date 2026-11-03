@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import { eventConfig } from '~/config/event'
+import { useSiteContent } from '~/composables/useSiteContent'
+
+const { content } = useSiteContent()
 </script>
 
 <template>
@@ -27,21 +29,21 @@ import { eventConfig } from '~/config/event'
           </h2>
 
           <h3 class="font-sans font-bold text-xl sm:text-2xl text-accent-400 uppercase tracking-wide">
-            {{ eventConfig.sundayService.title }}
+            {{ content.sunday.title }}
           </h3>
 
           <p class="text-surface-200 text-base sm:text-lg leading-relaxed font-normal">
-            {{ eventConfig.sundayService.message }}
+            {{ content.sunday.message }}
           </p>
 
           <p class="text-xs sm:text-sm text-surface-400 italic">
-            ✦ {{ eventConfig.sundayService.note }}
+            ✦ {{ content.sunday.note }}
           </p>
 
           <!-- Confident Accent Pill Button: "Message Us" -->
           <div class="pt-4">
             <a
-              :href="eventConfig.sundayService.messengerUrl"
+              :href="content.sunday.messengerUrl"
               target="_blank"
               rel="noopener noreferrer"
               class="inline-flex items-center justify-center gap-3 px-8 py-4 rounded-full bg-accent-500 hover:bg-accent-600 text-navy-950 font-black text-sm uppercase tracking-wider shadow-soft hover:shadow-glow-gold hover:-translate-y-0.5 active:translate-y-0 active:scale-95 transition-all duration-200"
@@ -61,7 +63,7 @@ import { eventConfig } from '~/config/event'
               <div class="flex items-center gap-3">
                 <img
                   src="/images/mnl-logo-white.png"
-                  :alt="eventConfig.logoAlt"
+                  :alt="content.siteSettings.logoAlt"
                   class="h-7 w-auto object-contain"
                 />
                 <div>
@@ -79,7 +81,7 @@ import { eventConfig } from '~/config/event'
             <!-- Venue Cards Stack -->
             <div class="space-y-3">
               <div
-                v-for="(venue, idx) in eventConfig.sundayService.venues"
+                v-for="(venue, idx) in content.sunday.venues"
                 :key="idx"
                 class="p-4 sm:p-5 rounded-3xl bg-white/5 hover:bg-white/10 border border-white/10 transition-colors text-left"
               >

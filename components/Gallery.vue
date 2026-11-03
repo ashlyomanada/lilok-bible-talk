@@ -1,59 +1,18 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
-import { eventConfig } from '~/config/event'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { useSiteContent } from '~/composables/useSiteContent'
 
-interface GalleryItem {
-  src: string
-  alt: string
-  title: string
-  subtitle: string
-  span?: string
-}
+const { content } = useSiteContent()
 
-const galleryImages: GalleryItem[] = [
-  {
-    src: '/images/gallery-1.jpg',
-    alt: 'Open Bible illuminated by gentle morning light',
-    title: 'Truth & Direction',
-    subtitle: 'Studying the scriptures together for real life guidance',
-    span: 'col-span-1 md:col-span-2 aspect-[16/10]'
-  },
-  {
-    src: '/images/gallery-3.jpg',
-    alt: 'Friends enjoying conversations over coffee and snacks',
-    title: 'Table Fellowship',
-    subtitle: 'Deep laughter, coffee, and authentic friendships',
-    span: 'col-span-1 md:col-span-1 aspect-[4/5]'
-  },
-  {
-    src: '/images/gallery-4.jpg',
-    alt: 'Hands held in prayer and mutual encouragement',
-    title: 'Prayer & Brotherhood',
-    subtitle: 'Standing together as disciples in every season',
-    span: 'col-span-1 md:col-span-1 aspect-[4/5]'
-  },
-  {
-    src: '/images/gallery-2.jpg',
-    alt: 'Acoustic worship and heartfelt praise',
-    title: 'Acoustic Fellowship',
-    subtitle: 'Heartfelt songs of praise and quiet reflection',
-    span: 'col-span-1 md:col-span-2 aspect-[16/10]'
-  },
-  {
-    src: '/images/gallery-5.jpg',
-    alt: 'Sunrise breaking over the horizon with hope',
-    title: 'Fresh Hope',
-    subtitle: 'Walking in the freedom and peace of Jesus',
-    span: 'col-span-1 md:col-span-2 aspect-[16/10]'
-  },
-  {
-    src: '/images/gallery-6.jpg',
-    alt: 'Warm discipleship gathering around a table',
-    title: 'Family in Christ',
-    subtitle: 'A place where you belong from day one',
-    span: 'col-span-1 md:col-span-1 aspect-[4/5]'
-  }
-]
+const galleryImages = computed(() => {
+  return content.value.gallery.map(g => ({
+    src: g.imageUrl,
+    alt: g.altText,
+    title: g.title,
+    subtitle: g.subtitle,
+    span: g.span
+  }))
+})
 
 const selectedIndex = ref<number | null>(null)
 
@@ -141,7 +100,7 @@ onUnmounted(() => {
           <!-- Editorial Gradient Overlay & Caption -->
           <div class="absolute inset-0 bg-gradient-to-t from-navy-950/85 via-navy-950/20 to-transparent opacity-80 group-hover:opacity-95 transition-opacity duration-300 flex flex-col justify-end p-6 sm:p-8 text-left text-white">
             <span class="text-[10px] font-black uppercase tracking-widest text-accent-400 mb-1">
-              {{ eventConfig.groupName }}
+              {{ content.siteSettings.groupName }}
             </span>
             <h3 class="font-sans font-black text-xl sm:text-2xl uppercase tracking-tight text-white mb-1">
               {{ img.title }}

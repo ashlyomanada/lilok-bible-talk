@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from "vue";
-import { eventConfig } from "~/config/event";
+import { useSiteContent } from "~/composables/useSiteContent";
+
+const { content } = useSiteContent();
 
 const DESKTOP_BREAKPOINT = 1024; // Tailwind `lg`. Below this width the hamburger menu is used.
 const SCROLL_OFFSET = 72; // Approx. height of the fixed header once scrolled
@@ -118,7 +120,7 @@ onUnmounted(() => {
           >
             <img
               src="/images/mnl-logo-white.png"
-              :alt="eventConfig.logoAlt"
+              :alt="content.siteSettings.logoAlt"
               class="h-8 sm:h-10 w-auto object-contain drop-shadow-sm"
               loading="eager"
             />
@@ -129,7 +131,7 @@ onUnmounted(() => {
               <span
                 class="font-sans font-black text-sm min-[380px]:text-base sm:text-lg leading-tight tracking-wide sm:tracking-wider uppercase text-white drop-shadow-sm truncate"
               >
-                {{ eventConfig.groupName }}
+                {{ content.siteSettings.groupName }}
               </span>
               <span
                 class="hidden sm:inline-flex shrink-0 items-center px-2 py-0.5 rounded-full text-[10px] font-bold tracking-widest uppercase bg-white/15 text-white/90 border border-white/20"
@@ -141,7 +143,7 @@ onUnmounted(() => {
             <span
               class="hidden min-[420px]:block text-[11px] font-medium tracking-wide text-surface-300/90 -mt-0.5 truncate"
             >
-              {{ eventConfig.parentChurchName }}
+              {{ content.siteSettings.parentChurchName }}
             </span>
           </div>
         </a>
@@ -166,7 +168,7 @@ onUnmounted(() => {
           </div>
 
           <a
-            :href="eventConfig.contact.messengerUrl"
+            :href="content.contacts.messengerUrl"
             target="_blank"
             rel="noopener noreferrer"
             class="inline-flex items-center justify-center px-6 py-2.5 rounded-full bg-accent-500 hover:bg-accent-600 text-navy-900 font-extrabold text-xs xl:text-sm tracking-wider uppercase shadow-soft hover:shadow-glow-gold hover:-translate-y-0.5 active:translate-y-0 active:scale-95 transition-all duration-200 whitespace-nowrap"
@@ -178,7 +180,7 @@ onUnmounted(() => {
         <!-- Mobile / Tablet: RSVP + Hamburger (below lg) -->
         <div class="flex items-center gap-1.5 sm:gap-2 shrink-0 lg:hidden">
           <a
-            :href="eventConfig.contact.messengerUrl"
+            :href="content.contacts.messengerUrl"
             target="_blank"
             rel="noopener noreferrer"
             class="inline-flex items-center justify-center min-h-10 px-4 sm:px-5 rounded-full bg-accent-500 text-navy-900 font-extrabold text-xs tracking-wider uppercase shadow-xs active:scale-95 transition-transform"
@@ -263,7 +265,7 @@ onUnmounted(() => {
           </nav>
 
           <p class="text-center text-xs text-surface-400">
-            {{ eventConfig.hashtag }} · {{ eventConfig.tagline }}
+            {{ content.siteSettings.hashtag }} · {{ content.siteSettings.tagline }}
           </p>
         </div>
       </div>

@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { eventConfig } from '~/config/event'
+import { useSiteContent } from '~/composables/useSiteContent'
 import { useToast } from '~/composables/useToast'
 
+const { content, nextSession } = useSiteContent()
 const { showToast } = useToast()
 const copied = ref(false)
 
@@ -10,14 +11,14 @@ const getShareUrl = () => {
   if (typeof window !== 'undefined') {
     return window.location.href.split('#')[0]
   }
-  return eventConfig.seo.canonicalUrl
+  return content.value.siteSettings.canonicalUrl
 }
 
 const handleShare = async () => {
   const url = getShareUrl()
   const shareData = {
-    title: "You're invited to Lilok Bible Talk",
-    text: `Hey! You're warmly invited to Lilok Bible Talk (${eventConfig.parentChurchName} Central Region) on ${eventConfig.formattedDateTime}. ${eventConfig.tagline} Follow ${eventConfig.instagramHandle}! ${eventConfig.hashtag}`,
+    title: `You're invited to ${content.value.siteSettings.groupName}`,
+    text: `Hey! You're warmly invited to ${content.value.siteSettings.groupName} (${content.value.siteSettings.parentChurchName} Central Region) on ${nextSession.value.formattedDateTime}. ${content.value.siteSettings.tagline} Follow ${content.value.contacts.instagramHandle}! ${content.value.siteSettings.hashtag}`,
     url
   }
 
@@ -59,14 +60,14 @@ const copyToClipboard = async () => {
 
 const getWhatsAppLink = () => {
   const text = encodeURIComponent(
-    `Hey! Check out this Bible Talk: "${eventConfig.groupName}: ${eventConfig.eventTitle}" (${eventConfig.parentChurchName} Central Region) on ${eventConfig.formattedDateTime}. Free & welcoming! ${eventConfig.tagline} ` + getShareUrl()
+    `Hey! Check out this Bible Talk: "${content.value.siteSettings.groupName}: ${content.value.event.title}" (${content.value.siteSettings.parentChurchName} Central Region) on ${nextSession.value.formattedDateTime}. Free & welcoming! ${content.value.siteSettings.tagline} ` + getShareUrl()
   )
   return `https://api.whatsapp.com/send?text=${text}`
 }
 
 const getSmsLink = () => {
   const text = encodeURIComponent(
-    `Hey! You're invited to Lilok Bible Talk (${eventConfig.parentChurchName}): ${getShareUrl()}`
+    `Hey! You're invited to ${content.value.siteSettings.groupName} (${content.value.siteSettings.parentChurchName}): ${getShareUrl()}`
   )
   return `sms:?&body=${text}`
 }
@@ -103,10 +104,10 @@ const getSmsLink = () => {
           <div class="flex items-center gap-2.5">
             <img
               src="/images/mnl-logo-white.png"
-              :alt="eventConfig.logoAlt"
+              :alt="content.siteSettings.logoAlt"
               class="h-6 w-auto object-contain"
             />
-            <span class="font-black text-xs uppercase tracking-wider text-white">{{ eventConfig.groupName }}</span>
+            <span class="font-black text-xs uppercase tracking-wider text-white">{{ content.siteSettings.groupName }}</span>
           </div>
           <span class="text-[10px] font-black uppercase tracking-wider text-accent-400 bg-white/10 px-2.5 py-0.5 rounded-full">
             VIP Invite
@@ -115,14 +116,14 @@ const getSmsLink = () => {
 
         <div class="py-4 space-y-1">
           <p class="text-xs font-black uppercase tracking-wider text-surface-400">You're Invited To</p>
-          <p class="font-sans font-black text-xl text-white uppercase tracking-tight">"{{ eventConfig.eventTitle }}"</p>
-          <p class="text-xs text-accent-400 font-semibold pt-1">{{ eventConfig.formattedDateTime }}</p>
-          <p class="text-xs text-surface-300">{{ eventConfig.venue.name }}</p>
+          <p class="font-sans font-black text-xl text-white uppercase tracking-tight">"{{ content.event.title }}"</p>
+          <p class="text-xs text-accent-400 font-semibold pt-1">{{ nextSession.formattedDateTime }}</p>
+          <p class="text-xs text-surface-300">{{ content.event.venue.name }}</p>
         </div>
 
         <div class="pt-3 border-t border-white/10 flex items-center justify-between text-[11px] text-surface-400">
-          <span>{{ eventConfig.hashtag }}</span>
-          <span class="text-white font-bold">{{ eventConfig.instagramHandle }}</span>
+          <span>{{ content.siteSettings.hashtag }}</span>
+          <span class="text-white font-bold">{{ content.contacts.instagramHandle }}</span>
         </div>
       </div>
 
@@ -158,7 +159,7 @@ const getSmsLink = () => {
       <div class="flex flex-wrap items-center justify-center gap-3">
         <!-- Messenger -->
         <a
-          :href="eventConfig.contact.messengerUrl"
+          :href="content.contacts.messengerUrl"
           target="_blank"
           rel="noopener noreferrer"
           class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 hover:bg-white/10 text-surface-200 hover:text-white border border-white/10 text-xs font-bold uppercase tracking-wider transition-colors"

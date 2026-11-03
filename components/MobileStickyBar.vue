@@ -1,14 +1,15 @@
 <script setup lang="ts">
-import { eventConfig } from '~/config/event'
+import { useSiteContent } from '~/composables/useSiteContent'
 import { useToast } from '~/composables/useToast'
 
+const { content, nextSession } = useSiteContent()
 const { showToast } = useToast()
 
 const handleShare = async () => {
-  const url = typeof window !== 'undefined' ? window.location.href.split('#')[0] : eventConfig.seo.canonicalUrl
+  const url = typeof window !== 'undefined' ? window.location.href.split('#')[0] : content.value.siteSettings.canonicalUrl
   const shareData = {
-    title: "You're invited to Lilok Bible Talk",
-    text: `You're warmly invited to Lilok Bible Talk (${eventConfig.parentChurchName} Central Region) on ${eventConfig.formattedDateTime}. ${eventConfig.tagline} Follow ${eventConfig.instagramHandle}! ${eventConfig.hashtag}`,
+    title: `You're invited to ${content.value.siteSettings.groupName}`,
+    text: `You're warmly invited to ${content.value.siteSettings.groupName} (${content.value.siteSettings.parentChurchName} Central Region) on ${nextSession.value.formattedDateTime}. ${content.value.siteSettings.tagline} Follow ${content.value.contacts.instagramHandle}! ${content.value.siteSettings.hashtag}`,
     url
   }
 
@@ -45,7 +46,7 @@ const handleShare = async () => {
     <div class="flex items-center gap-3 max-w-md mx-auto">
       <!-- RSVP on Messenger Pill Button -->
       <a
-        :href="eventConfig.contact.messengerUrl"
+        :href="content.contacts.messengerUrl"
         target="_blank"
         rel="noopener noreferrer"
         class="flex-1 inline-flex items-center justify-center gap-2 py-3.5 px-4 rounded-full bg-accent-500 hover:bg-accent-600 active:scale-[0.98] text-navy-950 font-black text-xs uppercase tracking-wider shadow-soft transition-transform"

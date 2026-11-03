@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import { eventConfig } from '~/config/event'
+import { useSiteContent } from '~/composables/useSiteContent'
+
+const { content } = useSiteContent()
 
 const welcomePoints = [
   {
@@ -30,17 +32,17 @@ const welcomePoints = [
           <div class="flex flex-wrap items-center gap-2.5">
             <span class="inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest text-accent-700">
               <span class="w-5 h-0.5 bg-accent-500"></span>
-              <span>About Lilok BT</span>
+              <span>About {{ content.siteSettings.groupName }}</span>
             </span>
 
             <span class="px-3.5 py-1 rounded-full text-xs font-bold bg-surface-200 border border-surface-300 text-navy-800 shadow-soft-sm">
-              {{ eventConfig.soldOutBadge }}
+              {{ content.siteSettings.soldOutBadge }}
             </span>
           </div>
 
           <!-- Large Editorial Headline -->
           <h2 class="font-sans font-black text-4xl sm:text-5xl lg:text-6xl uppercase tracking-tight text-navy-900 leading-[1.05]">
-            {{ eventConfig.tagline }}
+            {{ content.siteSettings.tagline }}
             <span class="block text-accent-600 mt-1">You Have a Seat at Our Table.</span>
           </h2>
 
@@ -53,12 +55,12 @@ const welcomePoints = [
             <!-- Church Identity Callout Card -->
             <div class="p-6 rounded-3xl bg-surface-50 border border-surface-300/80 shadow-soft-sm">
               <p class="font-medium text-navy-900 text-base leading-relaxed">
-                "{{ eventConfig.aboutChurch }}"
+                "{{ content.siteSettings.aboutChurch }}"
               </p>
               <div class="mt-4 flex flex-wrap items-center justify-between gap-2 pt-3 border-t border-surface-200 text-xs font-bold">
-                <span class="text-navy-700 tracking-wide uppercase">{{ eventConfig.parentChurchName }} · {{ eventConfig.parentRegion }}</span>
+                <span class="text-navy-700 tracking-wide uppercase">{{ content.siteSettings.parentChurchName }} · {{ content.siteSettings.parentRegion }}</span>
                 <span class="px-2.5 py-0.5 rounded-full bg-accent-500/15 text-accent-800 border border-accent-500/30 font-black">
-                  {{ eventConfig.hashtag }}
+                  {{ content.siteSettings.hashtag }}
                 </span>
               </div>
             </div>

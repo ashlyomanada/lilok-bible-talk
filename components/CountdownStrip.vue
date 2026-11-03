@@ -1,6 +1,8 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
-import { eventConfig } from '~/config/event'
+import { ref, onMounted, onUnmounted, watch } from 'vue'
+import { useSiteContent } from '~/composables/useSiteContent'
+
+const { content, nextSession } = useSiteContent()
 
 const days = ref(0)
 const hours = ref(0)
@@ -10,7 +12,7 @@ const isPast = ref(false)
 let timer: ReturnType<typeof setInterval> | null = null
 
 const calculateCountdown = () => {
-  const target = new Date(eventConfig.countdownTargetISO).getTime()
+  const target = new Date(nextSession.value.startISO).getTime()
   const now = new Date().getTime()
   const diff = target - now
 
@@ -30,6 +32,10 @@ const calculateCountdown = () => {
   seconds.value = Math.floor((diff % (1000 * 60)) / 1000)
 }
 
+watch(nextSession, () => {
+  calculateCountdown()
+})
+
 onMounted(() => {
   calculateCountdown()
   timer = setInterval(calculateCountdown, 1000)
@@ -41,7 +47,11 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <section id="countdown" class="bg-navy-950 border-y border-white/10 py-10 sm:py-14 relative overflow-hidden">
+  <section
+    v-if="content.event.countdownEnabled"
+    id="countdown"
+    class="bg-navy-950 border-y border-white/10 py-10 sm:py-14 relative overflow-hidden"
+  >
     <!-- Subtle ambient glow in background -->
     <div class="absolute inset-x-0 top-1/2 -translate-y-1/2 mx-auto w-96 h-28 bg-accent-500/10 blur-3xl pointer-events-none rounded-full"></div>
 
@@ -54,10 +64,10 @@ onUnmounted(() => {
             <span>Upcoming Gathering</span>
           </div>
           <h3 class="font-sans font-black text-2xl sm:text-3xl text-white tracking-tight uppercase">
-            {{ isPast ? 'Event In Progress' : 'Counting Down to Lilok BT' }}
+            {{ isPast ? 'Event In Progress' : `Counting Down to ${content.siteSettings.groupName}` }}
           </h3>
           <p class="text-xs sm:text-sm text-surface-300 font-medium">
-            {{ eventConfig.formattedDateTime }} · Central Region
+            {{ nextSession.formattedDateTime }} · Central Region
           </p>
         </div>
 
