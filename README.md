@@ -42,14 +42,16 @@ NUXT_PUBLIC_SUPABASE_KEY="your-anon-public-key"
 
 # Server-Only Configuration (Never leaked to client bundle)
 NUXT_SUPABASE_SECRET_KEY="your-supabase-secret-key"
+ADMIN_SESSION_SECRET="your-random-session-signing-secret"
 
 # Local Admin Fallback (Optional, for offline development)
-ADMIN_DEFAULT_EMAIL="admin@micc.church"
-ADMIN_DEFAULT_PASSWORD="YourSecurePasswordHere!"
+ADMIN_EMAIL="admin@micc.church"
+ADMIN_PASSWORD="YourSecurePasswordHere!"
 ```
 
 > [!CAUTION]
 > Never commit `.env` or your `NUXT_SUPABASE_SECRET_KEY` to GitHub. This server-only key bypasses PostgreSQL Row Level Security and must only be stored in your server environment variables or hosting dashboard.
+> `ADMIN_SESSION_SECRET` is also server-only. Set it to a unique random value; do not use a public Supabase key.
 
 ---
 
@@ -118,8 +120,9 @@ node .output/server/index.mjs
    - `NUXT_PUBLIC_SUPABASE_URL`
    - `NUXT_PUBLIC_SUPABASE_KEY`
    - `NUXT_SUPABASE_SECRET_KEY` (server-only)
-   - `ADMIN_DEFAULT_EMAIL`
-   - `ADMIN_DEFAULT_PASSWORD`
+   - `ADMIN_SESSION_SECRET` (server-only; required to sign admin API sessions)
+   - `ADMIN_EMAIL` (if using local admin fallback)
+   - `ADMIN_PASSWORD` (if using local admin fallback; also serves as a legacy signing-secret fallback)
 6. Deploy. Vercel automatically deploys Nitro serverless functions for hybrid rendering and API routes.
 
 ### Netlify Deployment
