@@ -308,7 +308,7 @@ BEGIN
       CREATE POLICY "Admin insert for %I" ON public.%I FOR INSERT WITH CHECK (public.is_admin());
       CREATE POLICY "Admin update for %I" ON public.%I FOR UPDATE USING (public.is_admin());
       CREATE POLICY "Admin delete for %I" ON public.%I FOR DELETE USING (public.is_admin());
-    ', t, t, t, t, t);
+    ', t, t, t, t, t, t, t, t);
   END LOOP;
 END $$;
 
@@ -340,7 +340,7 @@ BEGIN
       CREATE POLICY "Admin insert for %I" ON public.%I FOR INSERT WITH CHECK (public.is_admin());
       CREATE POLICY "Admin update for %I" ON public.%I FOR UPDATE USING (public.is_admin());
       CREATE POLICY "Admin delete for %I" ON public.%I FOR DELETE USING (public.is_admin());
-    ', t, t, t, t, t);
+    ', t, t, t, t, t, t, t, t);
   END LOOP;
 END $$;
 

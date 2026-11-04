@@ -3,6 +3,13 @@ import { ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { useAdminAuth } from '~/composables/useAdminAuth'
 
+useHead({
+  titleTemplate: '%s · Lilok Admin',
+  meta: [
+    { name: 'robots', content: 'noindex, nofollow' }
+  ]
+})
+
 const route = useRoute()
 const { adminUser, logout } = useAdminAuth()
 const isMobileMenuOpen = ref(false)

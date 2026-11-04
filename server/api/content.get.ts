@@ -103,18 +103,9 @@ export default defineEventHandler(async (event) => {
     const supabase = createClient(supabaseUrl, supabaseKey)
 
     // Parallel fetch from Supabase
-    const [
-      settingsRes,
-      eventRes,
-      contactsRes,
-      sundayRes,
-      venuesRes,
-      sectionsRes,
-      cardsRes,
-      verseRes,
-      galleryRes,
-      announcementRes
-    ] = await Promise.allSettled([
+    let timeout: ReturnType<typeof setTimeout>
+    const queryResults = await Promise.race([
+      Promise.allSettled([
       supabase.from('site_settings').select('*').eq('id', 'default').maybeSingle(),
       supabase.from('events').select('*').eq('id', 'current').maybeSingle(),
       supabase.from('contacts_social').select('*').eq('id', 'default').maybeSingle(),
@@ -125,7 +116,39 @@ export default defineEventHandler(async (event) => {
       supabase.from('verse').select('*').eq('id', 'default').maybeSingle(),
       supabase.from('gallery_images').select('*').eq('published', true).order('sort_order', { ascending: true }),
       supabase.from('announcements').select('*').eq('is_active', true).maybeSingle()
-    ])
+      ]),
+      new Promise<never>((_, reject) => {
+        timeout = setTimeout(() => reject(new Error('Supabase content request timed out')), 8000)
+      })
+    ]).finally(() => clearTimeout(timeout))
+    const [
+      settingsRes, eventRes, contactsRes, sundayRes, venuesRes,
+      sectionsRes, cardsRes, verseRes, galleryRes, announcementRes
+    ] = queryResults
+
+    const failedQueries = [
+      'site_settings', 'events', 'contacts_social', 'sunday_services', 'sunday_venues',
+      'sections', 'expect_cards', 'verse', 'gallery_images', 'announcements'
+    ].filter((table, index) => {
+      const result = [
+        settingsRes, eventRes, contactsRes, sundayRes, venuesRes,
+        sectionsRes, cardsRes, verseRes, galleryRes, announcementRes
+      ][index]
+      if (result.status === 'rejected') {
+        console.warn(`[site-content] ${table} query failed:`, result.reason)
+        return true
+      }
+      if (result.value.error) {
+        console.warn(`[site-content] ${table} query failed:`, result.value.error.message)
+        return true
+      }
+      return false
+    })
+
+    if (failedQueries.length) {
+      console.warn(`[site-content] Using local defaults because ${failedQueries.join(', ')} could not be read`)
+      return fallbackData
+    }
 
     const data = { ...fallbackData }
 
