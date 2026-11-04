@@ -36,12 +36,12 @@ cp .env.example .env
 
 Fill in your Supabase project keys in `.env`:
 ```ini
-# Supabase Public Configuration (Accessible to client)
-SUPABASE_URL="https://your-project.supabase.co"
-SUPABASE_KEY="your-anon-public-key"
+# Supabase Public Configuration (accessible to client)
+NUXT_PUBLIC_SUPABASE_URL="https://your-project.supabase.co"
+NUXT_PUBLIC_SUPABASE_KEY="your-anon-public-key"
 
 # Server-Only Configuration (Never leaked to client bundle)
-SUPABASE_SERVICE_ROLE_KEY="your-service-role-key"
+NUXT_SUPABASE_SECRET_KEY="your-supabase-secret-key"
 
 # Local Admin Fallback (Optional, for offline development)
 ADMIN_DEFAULT_EMAIL="admin@micc.church"
@@ -49,7 +49,7 @@ ADMIN_DEFAULT_PASSWORD="YourSecurePasswordHere!"
 ```
 
 > [!CAUTION]
-> Never commit `.env` or your `SUPABASE_SERVICE_ROLE_KEY` to GitHub. The service role key bypasses PostgreSQL Row Level Security and must only be stored in your server environment variables or hosting dashboard.
+> Never commit `.env` or your `NUXT_SUPABASE_SECRET_KEY` to GitHub. This server-only key bypasses PostgreSQL Row Level Security and must only be stored in your server environment variables or hosting dashboard.
 
 ---
 
@@ -113,11 +113,11 @@ node .output/server/index.mjs
 1. Connect your GitHub repository to [Vercel](https://vercel.com).
 2. Framework Preset: **Nuxt.js** (automatically detected).
 3. Build Command: `bun run build` (or `npm run build`).
-4. Output Directory: Default (`.output`).
+4. Leave the Output Directory unset so Nuxt/Nitro can generate and use Vercel's `.vercel/output` build.
 5. Configure Environment Variables in the Vercel Project Settings:
-   - `SUPABASE_URL`
-   - `SUPABASE_KEY`
-   - `SUPABASE_SERVICE_ROLE_KEY`
+   - `NUXT_PUBLIC_SUPABASE_URL`
+   - `NUXT_PUBLIC_SUPABASE_KEY`
+   - `NUXT_SUPABASE_SECRET_KEY` (server-only)
    - `ADMIN_DEFAULT_EMAIL`
    - `ADMIN_DEFAULT_PASSWORD`
 6. Deploy. Vercel automatically deploys Nitro serverless functions for hybrid rendering and API routes.
@@ -127,7 +127,7 @@ node .output/server/index.mjs
 2. Build command: `bun run build`.
 3. Publish directory: `.output/public`.
 4. Add Netlify Nuxt plugin or set `NITRO_PRESET=netlify`.
-5. Add the same Environment Variables under **Site configuration > Environment variables**.
+5. Add the same Environment Variables under **Site configuration > Environment variables**. Keep `NUXT_SUPABASE_SECRET_KEY` server-only; never prefix it with `NUXT_PUBLIC_`.
 
 ---
 
