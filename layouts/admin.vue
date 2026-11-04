@@ -48,12 +48,12 @@ const previewSite = () => {
 <template>
   <div class="min-h-screen bg-navy-950 text-surface-100 flex flex-col antialiased font-sans">
     <!-- Top Mobile / Desktop Header -->
-    <header class="h-16 bg-navy-900 border-b border-white/10 flex items-center justify-between px-4 sm:px-6 sticky top-0 z-40">
-      <div class="flex items-center gap-3">
+    <header class="h-16 bg-navy-900 border-b border-white/10 flex items-center justify-between gap-2 px-2.5 sm:px-6 sticky top-0 z-40">
+      <div class="flex min-w-0 items-center gap-2 sm:gap-3">
         <!-- Mobile hamburger button -->
         <button
           type="button"
-          class="lg:hidden p-2 rounded-xl bg-white/5 hover:bg-white/10 text-white"
+          class="lg:hidden shrink-0 p-2 rounded-xl bg-white/5 hover:bg-white/10 text-white"
           aria-label="Toggle navigation"
           @click="toggleMobileMenu"
         >
@@ -63,32 +63,33 @@ const previewSite = () => {
         </button>
 
         <!-- Brand logo -->
-        <NuxtLink to="/admin" class="flex items-center gap-2.5">
-          <img src="/images/mnl-logo-white.png" alt="Lilok Logo" class="h-7 w-auto object-contain" />
-          <div class="flex flex-col">
-            <span class="font-sans font-black text-sm uppercase tracking-wider text-white">Lilok CMS</span>
-            <span class="text-[10px] text-accent-400 font-bold uppercase tracking-widest -mt-0.5">Admin Console</span>
+        <NuxtLink to="/admin" class="flex min-w-0 items-center gap-2 sm:gap-2.5">
+          <img src="/images/mnl-logo-white.png" alt="Lilok Logo" class="h-7 w-auto shrink-0 object-contain" />
+          <div class="flex min-w-0 flex-col">
+            <span class="truncate font-sans font-black text-xs min-[360px]:text-sm uppercase tracking-wider text-white">Lilok CMS</span>
+            <span class="hidden min-[360px]:block text-[10px] text-accent-400 font-bold uppercase tracking-widest -mt-0.5">Admin Console</span>
           </div>
         </NuxtLink>
       </div>
 
       <!-- Right Header Actions -->
-      <div class="flex items-center gap-3">
+      <div class="flex shrink-0 items-center gap-1.5 sm:gap-3">
         <!-- Preview Site Button -->
         <button
           type="button"
-          class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider bg-white/10 hover:bg-white/15 text-white border border-white/20 transition-all hover:border-accent-500/50"
+          aria-label="Preview public site"
+          title="Preview public site"
+          class="inline-flex shrink-0 items-center justify-center gap-2 rounded-full border border-white/20 bg-white/10 p-2.5 text-xs font-bold uppercase tracking-wider text-white transition-all hover:border-accent-500/50 hover:bg-white/15 sm:px-3.5 sm:py-1.5"
           @click="previewSite"
         >
           <svg class="w-3.5 h-3.5 text-accent-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
           </svg>
           <span class="hidden sm:inline">Preview Site</span>
-          <span class="sm:hidden">Preview</span>
         </button>
 
         <!-- User profile badge & logout -->
-        <div class="flex items-center gap-2.5 pl-2 border-l border-white/15">
+        <div class="flex shrink-0 items-center gap-1.5 border-l border-white/15 pl-1.5 sm:gap-2.5 sm:pl-2">
           <div class="hidden md:flex flex-col text-right">
             <span class="text-xs font-bold text-white leading-tight truncate max-w-[140px]">
               {{ adminUser?.email || 'admin@micc.church' }}
