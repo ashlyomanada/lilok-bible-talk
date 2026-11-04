@@ -15,6 +15,17 @@ export default defineNuxtConfig({
     fonts: false
   },
 
+  runtimeConfig: {
+    public: {
+      supabase: {
+        // Keep compatibility with existing hosting variables while supporting
+        // Nuxt's preferred NUXT_PUBLIC_* names.
+        url: process.env.NUXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL || '',
+        key: process.env.NUXT_PUBLIC_SUPABASE_KEY || process.env.SUPABASE_KEY || ''
+      }
+    }
+  },
+
   supabase: {
     redirect: false
   },
@@ -24,7 +35,7 @@ export default defineNuxtConfig({
   ],
 
   routeRules: {
-    '/': { swr: 60 },
+    '/': { isr: 60 },
     '/admin/**': { ssr: false, headers: { 'X-Robots-Tag': 'noindex, nofollow' } },
     '/api/**': { cors: true }
   },
