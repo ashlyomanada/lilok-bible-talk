@@ -14,7 +14,7 @@ const defaultSections = [
   { id: 'connect', name: 'Connect With Us', title: 'Connect With Us', subtitle: 'Big Stacked Link Rows', sort_order: 11, is_visible: true }
 ]
 
-export default defineEventHandler(async () => {
+export default defineEventHandler(async (event) => {
   const supabase = getSupabaseAdmin(event)
   if (supabase) {
     try {

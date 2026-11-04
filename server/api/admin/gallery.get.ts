@@ -9,7 +9,7 @@ const defaultGallery = [
   { id: '6', image_url: '/images/gallery-6.jpg', alt_text: 'Warm discipleship gathering around a table', title: 'Family in Christ', subtitle: 'A place where you belong from day one', span: 'col-span-1 md:col-span-1 aspect-[4/5]', sort_order: 6, published: true }
 ]
 
-export default defineEventHandler(async () => {
+export default defineEventHandler(async (event) => {
   const supabase = getSupabaseAdmin(event)
   if (supabase) {
     try {

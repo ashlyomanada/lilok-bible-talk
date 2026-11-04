@@ -9,7 +9,7 @@ const defaultCards = [
   { id: '6', card_id: 'open-discussion', title: 'Open Bible Discussion', tagline: 'Ask questions freely', description: 'A relaxed circle where curiosities, questions, and personal thoughts are valued and respectfully explored.', icon: 'messages-square', badge: 'Interactive', span: 'col-span-1', sort_order: 6, published: true }
 ]
 
-export default defineEventHandler(async () => {
+export default defineEventHandler(async (event) => {
   const supabase = getSupabaseAdmin(event)
   if (supabase) {
     try {

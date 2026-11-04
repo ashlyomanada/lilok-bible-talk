@@ -1,6 +1,6 @@
 import { getSupabaseAdmin, localContentOverrides } from '~/server/utils/admin'
 
-export default defineEventHandler(async () => {
+export default defineEventHandler(async (event) => {
   const supabase = getSupabaseAdmin(event)
   if (supabase) {
     try {
