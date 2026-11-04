@@ -1,5 +1,6 @@
 <template>
   <UApp>
+    <ScrollProgressBar />
     <NuxtLayout>
       <NuxtPage />
     </NuxtLayout>

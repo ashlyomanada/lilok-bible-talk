@@ -47,7 +47,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: 'The uploaded file is not a valid JPG, PNG, or WebP image.' })
   }
 
-  const supabase = getSupabaseAdmin()
+  const supabase = getSupabaseAdmin(event)
   if (!supabase) {
     throw createError({ statusCode: 503, statusMessage: 'Submissions are temporarily unavailable.' })
   }

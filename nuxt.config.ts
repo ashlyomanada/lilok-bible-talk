@@ -16,6 +16,9 @@ export default defineNuxtConfig({
   },
 
   runtimeConfig: {
+    // Private server values are read per request by Nitro handlers.
+    supabaseSecretKey: '',
+    adminSessionSecret: '',
     public: {
       supabase: {
         // Keep compatibility with existing hosting variables while supporting

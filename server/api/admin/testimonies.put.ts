@@ -10,7 +10,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: 'Choose whether this testimony is published.' })
   }
 
-  const supabase = getSupabaseAdmin()
+  const supabase = getSupabaseAdmin(event)
   if (!supabase) throw createError({ statusCode: 503, statusMessage: 'Testimonies are unavailable: configure the server-only Supabase secret key.' })
 
   const { data, error } = await supabase.from('testimonies').update({

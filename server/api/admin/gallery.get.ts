@@ -10,7 +10,7 @@ const defaultGallery = [
 ]
 
 export default defineEventHandler(async () => {
-  const supabase = getSupabaseAdmin()
+  const supabase = getSupabaseAdmin(event)
   if (supabase) {
     try {
       const { data } = await supabase.from('gallery_images').select('*').order('sort_order', { ascending: true })

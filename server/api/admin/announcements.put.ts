@@ -22,7 +22,7 @@ export default defineEventHandler(async (event) => {
   }
   if (parsedId.success && parsedId.data) payload.id = parsedId.data
 
-  const supabase = getSupabaseAdmin()
+  const supabase = getSupabaseAdmin(event)
   if (!supabase) {
     throw createError({
       statusCode: 503,

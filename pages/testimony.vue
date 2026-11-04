@@ -15,7 +15,7 @@ interface Testimony {
   published_at: string | null
 }
 
-const { data: response, refresh } = await useAsyncData('public-testimonies', async () => {
+const { data: response, pending, refresh } = useAsyncData('public-testimonies', async () => {
   try {
     return await $fetch<{ data: Testimony[] }>('/api/testimonies')
   } catch {
@@ -63,7 +63,22 @@ onMounted(() => refresh())
             <p class="text-sm text-navy-600">Every story is reviewed before it appears here.</p>
           </div>
 
-          <div v-if="testimonies.length" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div v-if="pending && !testimonies.length" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" aria-label="Loading testimonies" aria-busy="true">
+            <div v-for="item in 6" :key="item" class="overflow-hidden rounded-3xl bg-white border border-surface-300 shadow-soft animate-pulse">
+              <div class="w-full aspect-[4/3] bg-surface-200" />
+              <div class="p-5 sm:p-6 space-y-4">
+                <div class="h-4 w-full rounded bg-surface-200" />
+                <div class="h-4 w-4/5 rounded bg-surface-200" />
+                <div class="flex items-center justify-between gap-3 mt-5 pt-4 border-t border-surface-200">
+                  <div class="h-4 w-28 rounded bg-surface-200" />
+                  <div class="h-3 w-20 rounded bg-surface-200" />
+                </div>
+              </div>
+            </div>
+            <span class="sr-only">Loading community testimonies</span>
+          </div>
+
+          <div v-else-if="testimonies.length" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             <article v-for="item in testimonies" :key="item.id" class="overflow-hidden rounded-3xl bg-white border border-surface-300 shadow-soft">
               <img :src="item.image_url" :alt="`Photo shared by ${item.name}`" class="w-full aspect-[4/3] object-cover" loading="lazy">
               <div class="p-5 sm:p-6">

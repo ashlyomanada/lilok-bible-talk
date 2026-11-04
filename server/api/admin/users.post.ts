@@ -8,7 +8,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: 'Email and password are required' })
   }
 
-  const supabase = getSupabaseAdmin()
+  const supabase = getSupabaseAdmin(event)
   if (supabase) {
     try {
       const { data: authData, error: authErr } = await supabase.auth.admin.createUser({

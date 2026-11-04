@@ -1,7 +1,7 @@
 import { getSupabaseAdmin, localContentOverrides } from '~/server/utils/admin'
 
 export default defineEventHandler(async () => {
-  const supabase = getSupabaseAdmin()
+  const supabase = getSupabaseAdmin(event)
   if (supabase) {
     try {
       const { data } = await supabase.from('announcements').select('*').order('created_at', { ascending: false }).limit(1).maybeSingle()

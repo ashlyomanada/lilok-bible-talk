@@ -3,7 +3,7 @@ import { getSupabaseAdmin } from '~/server/utils/admin'
 export default defineEventHandler(async (event) => {
   setResponseHeader(event, 'Cache-Control', 'public, max-age=30, stale-while-revalidate=60')
 
-  const supabase = getSupabaseAdmin()
+  const supabase = getSupabaseAdmin(event)
   if (!supabase) return { data: [] }
 
   const { data, error } = await supabase

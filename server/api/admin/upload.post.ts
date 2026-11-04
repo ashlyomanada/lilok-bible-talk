@@ -38,7 +38,7 @@ export default defineEventHandler(async (event) => {
   const ext = path.extname(fileItem.filename || '.jpg') || '.jpg'
   const uniqueName = `upload-${Date.now()}-${Math.random().toString(36).slice(2, 8)}${ext}`
 
-  const supabase = getSupabaseAdmin()
+  const supabase = getSupabaseAdmin(event)
   if (!supabase) {
     throw createError({
       statusCode: 503,

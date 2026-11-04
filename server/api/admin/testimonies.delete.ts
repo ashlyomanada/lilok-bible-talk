@@ -7,7 +7,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: 'A valid testimony ID is required.' })
   }
 
-  const supabase = getSupabaseAdmin()
+  const supabase = getSupabaseAdmin(event)
   if (!supabase) throw createError({ statusCode: 503, statusMessage: 'Testimonies are unavailable: configure the server-only Supabase secret key.' })
 
   const { data: testimony, error: lookupError } = await supabase.from('testimonies').select('id, image_path, name').eq('id', id).maybeSingle()

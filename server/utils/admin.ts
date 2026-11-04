@@ -71,9 +71,14 @@ export function getActivityLogs() {
   return inMemoryActivityLogs
 }
 
-export function getSupabaseAdmin() {
-  const supabaseUrl = process.env.SUPABASE_URL || process.env.NUXT_PUBLIC_SUPABASE_URL
-  const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NUXT_SUPABASE_SECRET_KEY
+export function getSupabaseAdmin(event: H3Event) {
+  const config = useRuntimeConfig(event)
+  const supabaseUrl = config.public.supabase.url || process.env.SUPABASE_URL || process.env.NUXT_PUBLIC_SUPABASE_URL
+  const supabaseServiceKey = config.supabaseSecretKey
+    || process.env.NUXT_SUPABASE_SECRET_KEY
+    || process.env.SUPABASE_SECRET_KEY
+    || process.env.SUPABASE_SERVICE_KEY
+    || process.env.SUPABASE_SERVICE_ROLE_KEY
 
   if (!supabaseUrl || !supabaseServiceKey) {
     return null
@@ -82,16 +87,20 @@ export function getSupabaseAdmin() {
   return createClient(supabaseUrl, supabaseServiceKey)
 }
 
-function getAdminSessionSecret() {
-  return process.env.ADMIN_SESSION_SECRET
+function getAdminSessionSecret(event: H3Event) {
+  const config = useRuntimeConfig(event)
+  return config.adminSessionSecret
+    || process.env.ADMIN_SESSION_SECRET
+    || config.supabaseSecretKey
     || process.env.NUXT_SUPABASE_SECRET_KEY
+    || process.env.SUPABASE_SECRET_KEY
     || process.env.SUPABASE_SERVICE_KEY
     || process.env.SUPABASE_SERVICE_ROLE_KEY
     || process.env.ADMIN_PASSWORD
 }
 
 export function setAdminApiSession(event: H3Event, user: { role: string; [key: string]: unknown }) {
-  const secret = getAdminSessionSecret()
+  const secret = getAdminSessionSecret(event)
   if (!secret) {
     throw createError({ statusCode: 503, statusMessage: 'Server-side admin session signing is not configured.' })
   }
@@ -113,7 +122,7 @@ export function clearAdminApiSession(event: H3Event) {
 
 export function requireAdminSession(event: H3Event) {
   const sessionCookie = getCookie(event, 'lilok_admin_api_session')
-  const secret = getAdminSessionSecret()
+  const secret = getAdminSessionSecret(event)
   try {
     if (sessionCookie && secret) {
       const [payload, signature] = sessionCookie.split('.')

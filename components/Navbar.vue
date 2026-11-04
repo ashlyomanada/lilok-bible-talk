@@ -1,14 +1,17 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from "vue";
+import { computed, ref, onMounted, onUnmounted } from "vue";
 import { useSiteContent } from "~/composables/useSiteContent";
 
 const { content } = useSiteContent();
+const route = useRoute();
 
 const DESKTOP_BREAKPOINT = 1024; // Tailwind `lg`. Below this width the hamburger menu is used.
 const SCROLL_OFFSET = 72; // Approx. height of the fixed header once scrolled
 
 const isScrolled = ref(false);
 const isMobileMenuOpen = ref(false);
+const activeSection = ref("hero");
+const isTestimonyPage = computed(() => route.path === "/testimony");
 
 // Single source of truth for both desktop and mobile navigation.
 // `desktop` is only set for links that appear in the desktop bar.
@@ -64,6 +67,19 @@ const scrollTo = (selector: string) => {
 
 const handleScroll = () => {
   isScrolled.value = window.scrollY > 40;
+
+  if (route.path !== "/") return;
+  const marker = window.innerHeight * 0.35;
+  let currentSection = "hero";
+
+  for (const link of navLinks) {
+    const section = document.querySelector<HTMLElement>(link.target);
+    if (section && section.getBoundingClientRect().top <= marker) {
+      currentSection = link.target.slice(1);
+    }
+  }
+
+  activeSection.value = currentSection;
 };
 
 const handleResize = () => {
@@ -103,6 +119,7 @@ onUnmounted(() => {
   <div>
     <header
       class="fixed top-0 left-0 right-0 z-50 pt-[env(safe-area-inset-top)] transition-all duration-300 motion-reduce:transition-none"
+      :style="{ top: content.announcement ? 'var(--announcement-height, 40px)' : '0px' }"
       :class="[
         isScrolled || isMobileMenuOpen
           ? 'bg-navy-900/95 backdrop-blur-md border-b border-white/10 shadow-soft'
@@ -164,13 +181,26 @@ onUnmounted(() => {
               v-for="link in desktopLinks"
               :key="link.target"
               type="button"
-              class="text-white/80 hover:text-white transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-500 rounded px-1 whitespace-nowrap"
+              :aria-current="!isTestimonyPage && activeSection === link.target.slice(1) ? 'location' : undefined"
+              class="transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-500 rounded px-1 whitespace-nowrap"
+              :class="!isTestimonyPage && activeSection === link.target.slice(1) ? 'text-accent-400' : 'text-white/80 hover:text-white'"
               @click="scrollTo(link.target)"
             >
               {{ link.desktop }}
+              <span
+                v-if="!isTestimonyPage && activeSection === link.target.slice(1)"
+                class="ml-1 inline-block h-1.5 w-1.5 rounded-full bg-accent-400 align-middle"
+                aria-hidden="true"
+              />
             </button>
-            <NuxtLink to="/testimony" class="text-white/80 hover:text-white transition-colors rounded px-1 whitespace-nowrap">
+            <NuxtLink
+              to="/testimony"
+              :aria-current="isTestimonyPage ? 'page' : undefined"
+              class="normal-case transition-colors rounded px-1 whitespace-nowrap"
+              :class="isTestimonyPage ? 'text-accent-400' : 'text-white/80 hover:text-white'"
+            >
               Testimonies
+              <span v-if="isTestimonyPage" class="ml-1 inline-block h-1.5 w-1.5 rounded-full bg-accent-400 align-middle" aria-hidden="true" />
             </NuxtLink>
           </div>
 
@@ -264,17 +294,27 @@ onUnmounted(() => {
               v-for="link in navLinks"
               :key="link.target"
               type="button"
-              class="text-left py-3.5 font-bold text-base sm:text-lg uppercase tracking-wider text-white/90 hover:text-accent-500 active:text-accent-500 transition-colors border-b border-white/10 last:border-b-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-500 rounded"
+              :aria-current="!isTestimonyPage && activeSection === link.target.slice(1) ? 'location' : undefined"
+              class="text-left py-3.5 font-bold text-base sm:text-lg uppercase tracking-wider transition-colors border-b border-white/10 last:border-b-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-500 rounded"
+              :class="!isTestimonyPage && activeSection === link.target.slice(1) ? 'text-accent-400' : 'text-white/90 hover:text-accent-500 active:text-accent-500'"
               @click="scrollTo(link.target)"
             >
               {{ link.mobile }}
+              <span
+                v-if="!isTestimonyPage && activeSection === link.target.slice(1)"
+                class="ml-2 inline-block h-1.5 w-1.5 rounded-full bg-accent-400 align-middle"
+                aria-hidden="true"
+              />
             </button>
             <NuxtLink
               to="/testimony"
-              class="text-left py-3.5 font-bold text-base sm:text-lg uppercase tracking-wider text-white/90 hover:text-accent-500 transition-colors border-b border-white/10"
+              :aria-current="isTestimonyPage ? 'page' : undefined"
+              class="normal-case text-left py-3.5 font-bold text-base sm:text-lg tracking-wider transition-colors border-b border-white/10"
+              :class="isTestimonyPage ? 'text-accent-400' : 'text-white/90 hover:text-accent-500'"
               @click="closeMenu"
             >
               Testimonies
+              <span v-if="isTestimonyPage" class="ml-2 inline-block h-1.5 w-1.5 rounded-full bg-accent-400 align-middle" aria-hidden="true" />
             </NuxtLink>
           </nav>
 

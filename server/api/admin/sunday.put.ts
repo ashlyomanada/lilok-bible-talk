@@ -19,7 +19,7 @@ export default defineEventHandler(async (event) => {
     updated_at: new Date().toISOString()
   }
 
-  const supabase = getSupabaseAdmin()
+  const supabase = getSupabaseAdmin(event)
   if (!supabase) {
     throw createError({
       statusCode: 503,

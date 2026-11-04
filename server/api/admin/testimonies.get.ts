@@ -2,7 +2,7 @@ import { getSupabaseAdmin, requireAdminSession } from '~/server/utils/admin'
 
 export default defineEventHandler(async (event) => {
   requireAdminSession(event)
-  const supabase = getSupabaseAdmin()
+  const supabase = getSupabaseAdmin(event)
   if (!supabase) {
     throw createError({ statusCode: 503, statusMessage: 'Testimonies are unavailable: configure the server-only Supabase secret key.' })
   }

@@ -2,7 +2,7 @@ import { getSupabaseAdmin, localContentOverrides } from '~/server/utils/admin'
 import { eventConfig } from '~/config/event'
 
 export default defineEventHandler(async () => {
-  const supabase = getSupabaseAdmin()
+  const supabase = getSupabaseAdmin(event)
   if (supabase) {
     try {
       const { data } = await supabase.from('verse').select('*').eq('id', 'default').maybeSingle()

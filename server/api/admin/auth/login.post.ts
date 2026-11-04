@@ -27,7 +27,7 @@ export default defineEventHandler(async (event) => {
   const expectedAdminPassword = process.env.ADMIN_PASSWORD || 'LilokAdmin2026!'
 
   // 3. Authenticate with Supabase if available
-  const supabase = getSupabaseAdmin()
+  const supabase = getSupabaseAdmin(event)
   if (supabase) {
     try {
       const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
