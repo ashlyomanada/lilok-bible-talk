@@ -31,7 +31,7 @@ const venues = ref<Array<{
   notes: string
   published: boolean
 }>>(
-  sundayRes.value?.venues && sundayRes.value.venues.length > 0
+  Array.isArray(sundayRes.value?.venues)
     ? JSON.parse(JSON.stringify(sundayRes.value.venues))
     : [
         {

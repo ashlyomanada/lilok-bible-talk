@@ -9,7 +9,7 @@ export default defineEventHandler(async (event) => {
   }
 
   const updatedItems = items.map((img, idx) => ({
-    id: img.id || `gal-${idx + 1}`,
+    ...(img.id && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(img.id) ? { id: img.id } : {}),
     image_url: img.image_url,
     alt_text: img.alt_text || 'Gallery photo',
     title: img.title || 'Fellowship',
@@ -21,17 +21,35 @@ export default defineEventHandler(async (event) => {
   }))
 
   const supabase = getSupabaseAdmin()
-  if (supabase) {
-    try {
-      for (const img of updatedItems) {
-        await supabase.from('gallery_images').upsert(img)
-      }
-    } catch {}
+  if (!supabase) {
+    throw createError({
+      statusCode: 503,
+      statusMessage: 'Gallery cannot be saved: configure the server-only Supabase secret key.'
+    })
   }
 
-  localContentOverrides['gallery'] = updatedItems
+  const savedItems = []
+  for (const img of updatedItems) {
+    const { data, error } = await supabase
+      .from('gallery_images')
+      .upsert(img)
+      .select()
+      .single()
+
+    if (error || !data) {
+      console.error('Supabase gallery save failed:', error?.message || 'No saved row returned')
+      throw createError({
+        statusCode: 502,
+        statusMessage: error?.message || 'Supabase could not save the gallery. Check the database permissions and schema.'
+      })
+    }
+
+    savedItems.push(data)
+  }
+
+  localContentOverrides['gallery'] = savedItems
   logActivity('admin', 'UPDATE', 'gallery', 'all', { count: updatedItems.length })
 
-  return { success: true, data: updatedItems }
+  return { success: true, data: savedItems }
 })
 

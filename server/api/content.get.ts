@@ -238,7 +238,7 @@ export default defineEventHandler(async (event) => {
       data.sunday.note = s.note || data.sunday.note
       data.sunday.messengerUrl = s.messenger_url || data.sunday.messengerUrl
     }
-    if (venuesRes.status === 'fulfilled' && venuesRes.value.data && venuesRes.value.data.length > 0) {
+    if (venuesRes.status === 'fulfilled' && venuesRes.value.data) {
       data.sunday.venues = venuesRes.value.data.map(v => ({
         city: v.city,
         venueName: v.venue_name,

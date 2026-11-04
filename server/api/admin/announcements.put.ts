@@ -3,7 +3,12 @@ import { getSupabaseAdmin, localContentOverrides, logActivity } from '~/server/u
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event)
-  const parsed = announcementSchema.safeParse(body)
+  const candidateId = typeof body?.id === 'string' ? body.id : undefined
+  const parsedId = announcementSchema.shape.id.safeParse(candidateId)
+  const input = { ...body }
+  if (!parsedId.success) delete input.id
+
+  const parsed = announcementSchema.safeParse(input)
   if (!parsed.success) {
     throw createError({
       statusCode: 400,
@@ -12,21 +17,31 @@ export default defineEventHandler(async (event) => {
   }
 
   const payload = {
-    id: body.id || 'announcement-1',
     ...parsed.data,
     updated_at: new Date().toISOString()
   }
+  if (parsedId.success && parsedId.data) payload.id = parsedId.data
 
   const supabase = getSupabaseAdmin()
-  if (supabase) {
-    try {
-      await supabase.from('announcements').upsert(payload)
-    } catch {}
+  if (!supabase) {
+    throw createError({
+      statusCode: 503,
+      statusMessage: 'Announcement cannot be saved: configure the server-only Supabase secret key.'
+    })
   }
 
-  localContentOverrides['announcement'] = payload
-  logActivity('admin', 'UPDATE', 'announcement', payload.id, { message: payload.message, active: payload.is_active })
+  const { data, error } = await supabase.from('announcements').upsert(payload).select().single()
+  if (error || !data) {
+    console.error('Supabase announcement save failed:', error?.message || 'No saved row returned')
+    throw createError({
+      statusCode: 502,
+      statusMessage: error?.message || 'Could not save the announcement.'
+    })
+  }
 
-  return { success: true, data: payload }
+  localContentOverrides['announcement'] = data
+  logActivity('admin', 'UPDATE', 'announcement', data.id, { message: data.message, active: data.is_active })
+
+  return { success: true, data }
 })
 

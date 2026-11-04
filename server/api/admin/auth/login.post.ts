@@ -1,5 +1,5 @@
 import { loginSchema } from '~/shared/schemas/site'
-import { checkRateLimit, resetRateLimit, logActivity, getSupabaseAdmin } from '~/server/utils/admin'
+import { checkRateLimit, resetRateLimit, logActivity, getSupabaseAdmin, setAdminApiSession } from '~/server/utils/admin'
 
 export default defineEventHandler(async (event) => {
   const ip = getRequestIP(event, { xForwardedFor: true }) || '127.0.0.1'
@@ -60,6 +60,7 @@ export default defineEventHandler(async (event) => {
             sameSite: 'lax',
             maxAge: 60 * 60 * 24 * 7 // 7 days
           })
+          setAdminApiSession(event, user)
 
           return { success: true, user }
         }
@@ -87,6 +88,7 @@ export default defineEventHandler(async (event) => {
       sameSite: 'lax',
       maxAge: 60 * 60 * 24 * 7
     })
+    setAdminApiSession(event, user)
 
     return { success: true, user }
   }

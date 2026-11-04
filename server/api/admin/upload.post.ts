@@ -1,4 +1,3 @@
-import fs from 'node:fs'
 import path from 'node:path'
 import { getSupabaseAdmin, logActivity } from '~/server/utils/admin'
 
@@ -40,51 +39,48 @@ export default defineEventHandler(async (event) => {
   const uniqueName = `upload-${Date.now()}-${Math.random().toString(36).slice(2, 8)}${ext}`
 
   const supabase = getSupabaseAdmin()
-  if (supabase) {
-    try {
-      const { data, error } = await supabase.storage
-        .from('site-media')
-        .upload(`gallery/${uniqueName}`, fileItem.data, {
-          contentType: mimeType,
-          upsert: false
-        })
+  if (!supabase) {
+    throw createError({
+      statusCode: 503,
+      statusMessage: 'Image uploads are unavailable: configure the server-only Supabase secret key.'
+    })
+  }
 
-      if (!error && data) {
-        const { data: publicUrlData } = supabase.storage
-          .from('site-media')
-          .getPublicUrl(data.path)
+  try {
+    const { data, error } = await supabase.storage
+      .from('site-media')
+      .upload(`gallery/${uniqueName}`, fileItem.data, {
+        contentType: mimeType,
+        upsert: false
+      })
 
-        logActivity('admin', 'UPLOAD', 'media', uniqueName, { url: publicUrlData.publicUrl, altText })
-
-        return {
-          success: true,
-          url: publicUrlData.publicUrl,
-          altText,
-          filename: uniqueName
-        }
-      }
-    } catch (e: any) {
-      console.warn('Supabase storage upload failed, using local public upload:', e.message)
+    if (error || !data) {
+      console.error('Supabase gallery upload failed:', error?.message || 'No upload result returned')
+      throw createError({
+        statusCode: 502,
+        statusMessage: error?.message || 'Supabase Storage did not accept the upload.'
+      })
     }
-  }
 
-  // Local storage fallback into public/images/uploads
-  const uploadDir = path.resolve(process.cwd(), 'public/images/uploads')
-  if (!fs.existsSync(uploadDir)) {
-    fs.mkdirSync(uploadDir, { recursive: true })
-  }
+    const { data: publicUrlData } = supabase.storage
+      .from('site-media')
+      .getPublicUrl(data.path)
 
-  const filePath = path.join(uploadDir, uniqueName)
-  fs.writeFileSync(filePath, fileItem.data)
+    logActivity('admin', 'UPLOAD', 'media', uniqueName, { url: publicUrlData.publicUrl, altText })
 
-  const publicUrl = `/images/uploads/${uniqueName}`
-  logActivity('admin', 'UPLOAD', 'media', uniqueName, { url: publicUrl, altText })
-
-  return {
-    success: true,
-    url: publicUrl,
-    altText,
-    filename: uniqueName
+    return {
+      success: true,
+      url: publicUrlData.publicUrl,
+      altText,
+      filename: uniqueName
+    }
+  } catch (error: any) {
+    if (error?.statusCode) throw error
+    console.error('Supabase gallery upload failed:', error?.message || error)
+    throw createError({
+      statusCode: 502,
+      statusMessage: 'Supabase Storage upload failed. Check the site-media bucket and server key.'
+    })
   }
 })
 

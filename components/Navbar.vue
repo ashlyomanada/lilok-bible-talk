@@ -41,6 +41,10 @@ const toggleMobileMenu = () => {
 
 const scrollTo = (selector: string) => {
   closeMenu();
+  if (window.location.pathname !== "/") {
+    navigateTo(`/${selector}`);
+    return;
+  }
   const target = document.querySelector<HTMLElement>(selector);
   if (!target) return;
 
@@ -165,6 +169,9 @@ onUnmounted(() => {
             >
               {{ link.desktop }}
             </button>
+            <NuxtLink to="/testimony" class="text-white/80 hover:text-white transition-colors rounded px-1 whitespace-nowrap">
+              Testimonies
+            </NuxtLink>
           </div>
 
           <a
@@ -262,6 +269,13 @@ onUnmounted(() => {
             >
               {{ link.mobile }}
             </button>
+            <NuxtLink
+              to="/testimony"
+              class="text-left py-3.5 font-bold text-base sm:text-lg uppercase tracking-wider text-white/90 hover:text-accent-500 transition-colors border-b border-white/10"
+              @click="closeMenu"
+            >
+              Testimonies
+            </NuxtLink>
           </nav>
 
           <p class="text-center text-xs text-surface-400">

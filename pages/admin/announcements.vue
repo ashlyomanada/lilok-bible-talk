@@ -14,7 +14,7 @@ const { isDirty, markDirty, markClean } = useUnsavedChanges()
 const { data: res, refresh } = await useAsyncData('admin-announcement', () => $fetch('/api/admin/announcements'))
 
 const form = ref({
-  id: res.value?.data?.id || 'announcement-1',
+  id: res.value?.data?.id,
   message: res.value?.data?.message || 'Special gathering this Thursday! Invite your friends and join us for fellowship.',
   link_url: res.value?.data?.link_url || 'https://m.me/manilaicc',
   link_text: res.value?.data?.link_text || 'Message Us on Messenger',

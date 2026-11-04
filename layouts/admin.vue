@@ -2,6 +2,7 @@
 import { ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { useAdminAuth } from '~/composables/useAdminAuth'
+import ToastContainer from '~/components/ToastContainer.vue'
 
 useHead({
   titleTemplate: '%s · Lilok Admin',
@@ -20,6 +21,7 @@ const navItems = [
   { label: 'Sections', to: '/admin/sections', icon: 'layers' },
   { label: 'What to Expect', to: '/admin/expect-cards', icon: 'sparkles' },
   { label: 'Photo Gallery', to: '/admin/gallery', icon: 'image' },
+  { label: 'Testimonies', to: '/admin/testimonies', icon: 'book-open' },
   { label: 'Sunday Worship', to: '/admin/sunday', icon: 'church' },
   { label: 'Scripture Highlight', to: '/admin/verse', icon: 'book-open' },
   { label: 'Contacts & Social', to: '/admin/contacts', icon: 'share-2' },
@@ -230,6 +232,7 @@ const previewSite = () => {
         <slot />
       </main>
     </div>
+    <ToastContainer />
   </div>
 </template>
 

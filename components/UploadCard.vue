@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import { eventConfig } from '~/config/event'
+import { onUnmounted, ref } from 'vue'
 import { useToast } from '~/composables/useToast'
 
 const { showToast } = useToast()
@@ -8,7 +7,9 @@ const { showToast } = useToast()
 const fileInputRef = ref<HTMLInputElement | null>(null)
 const previewUrl = ref<string | null>(null)
 const selectedFileName = ref<string>('')
+const selectedFile = ref<File | null>(null)
 const isDragging = ref(false)
+const isSubmitting = ref(false)
 
 const form = ref({
   name: '',
@@ -30,10 +31,16 @@ const handleDrop = (e: DragEvent) => {
 }
 
 const processFile = (file: File) => {
-  if (!file.type.startsWith('image/')) {
-    showToast('Please select an image file (PNG, JPG, etc.)', 'warning')
+  if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
+    showToast('Please choose a JPG, PNG, or WebP image.', 'warning')
     return
   }
+  if (file.size > 10 * 1024 * 1024) {
+    showToast('Photos must be 10 MB or smaller.', 'warning')
+    return
+  }
+  if (previewUrl.value) URL.revokeObjectURL(previewUrl.value)
+  selectedFile.value = file
   selectedFileName.value = file.name
   previewUrl.value = URL.createObjectURL(file)
   showToast(`Photo "${file.name}" loaded into preview`, 'info')
@@ -45,6 +52,7 @@ const triggerFileInput = () => {
 
 const clearSelectedImage = () => {
   selectedFileName.value = ''
+  selectedFile.value = null
   if (previewUrl.value) {
     URL.revokeObjectURL(previewUrl.value)
     previewUrl.value = null
@@ -54,10 +62,36 @@ const clearSelectedImage = () => {
   }
 }
 
-const handleSubmit = (e: Event) => {
-  e.preventDefault()
-  showToast('Photo & testimony uploads will open on event day! Stay tuned.', 'info', 4500)
+const handleSubmit = async () => {
+  if (!form.value.name.trim()) {
+    showToast('Please enter your name.', 'warning')
+    return
+  }
+  if (!selectedFile.value) {
+    showToast('Please choose a photo to submit.', 'warning')
+    return
+  }
+
+  isSubmitting.value = true
+  const submission = new FormData()
+  submission.append('photo', selectedFile.value)
+  submission.append('name', form.value.name.trim())
+  submission.append('message', form.value.message.trim())
+
+  try {
+    await $fetch('/api/testimonies', { method: 'POST', body: submission })
+    clearSelectedImage()
+    form.value.name = ''
+    form.value.message = ''
+    showToast('Thank you! Your photo and testimony were sent for review.', 'success', 5000)
+  } catch (err: any) {
+    showToast(err?.data?.statusMessage || err?.statusMessage || 'Submission failed. Please try again.', 'error')
+  } finally {
+    isSubmitting.value = false
+  }
 }
+
+onUnmounted(clearSelectedImage)
 </script>
 
 <template>
@@ -67,7 +101,7 @@ const handleSubmit = (e: Event) => {
       <div class="text-center max-w-2xl mx-auto mb-12 sm:mb-16">
         <div class="inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest text-accent-700 mb-3">
           <span class="w-5 h-0.5 bg-accent-500"></span>
-          <span>Community Wall · Coming Soon</span>
+          <span>Community Wall</span>
           <span class="w-5 h-0.5 bg-accent-500"></span>
         </div>
         <h2 class="font-sans font-black text-4xl sm:text-5xl lg:text-6xl uppercase tracking-tight text-navy-900 mb-4">
@@ -76,16 +110,19 @@ const handleSubmit = (e: Event) => {
         <p class="text-navy-700 text-base sm:text-lg font-normal leading-relaxed">
           Have an encouraging photo, discipleship memory, or short word of faith? We love celebrating what God is doing!
         </p>
+        <NuxtLink to="/testimony" class="inline-flex mt-4 text-sm font-bold text-accent-800 hover:text-accent-900 underline underline-offset-4">
+          View community testimonies
+        </NuxtLink>
       </div>
 
       <!-- Upload Form Card -->
       <div class="bg-white rounded-4xl sm:rounded-5xl p-6 sm:p-10 md:p-12 border border-surface-300 shadow-soft-xl">
-        <form @submit="handleSubmit" class="space-y-6">
+        <form @submit.prevent="handleSubmit" class="space-y-6">
           <!-- Hidden Native File Input -->
           <input
             ref="fileInputRef"
             type="file"
-            accept="image/*"
+            accept="image/jpeg,image/png,image/webp"
             class="hidden"
             @change="handleFileSelect"
           />
@@ -142,7 +179,7 @@ const handleSubmit = (e: Event) => {
                 </p>
               </div>
               <span class="text-[11px] font-medium text-navy-500">
-                Supports JPG, PNG, WEBP (up to 10MB) · UI Preview
+                Supports JPG, PNG, WebP (up to 10 MB)
               </span>
             </div>
           </div>
@@ -182,17 +219,18 @@ const handleSubmit = (e: Event) => {
               <svg class="w-4 h-4 text-accent-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
               </svg>
-              <span>Uploads open on event day. Submissions are moderated.</span>
+              <span>Submissions are reviewed before they appear publicly.</span>
             </div>
 
             <button
               type="submit"
-              class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-full bg-accent-500 hover:bg-accent-600 text-navy-950 font-black text-xs sm:text-sm uppercase tracking-wider shadow-soft hover:shadow-glow-gold active:scale-95 transition-all"
+              :disabled="isSubmitting"
+              class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-full bg-accent-500 hover:bg-accent-600 disabled:opacity-60 disabled:cursor-wait text-navy-950 font-black text-xs sm:text-sm uppercase tracking-wider shadow-soft hover:shadow-glow-gold active:scale-95 transition-all"
             >
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
               </svg>
-              <span>Submit Photo / Testimony</span>
+              <span>{{ isSubmitting ? 'Submitting...' : 'Submit Photo / Testimony' }}</span>
             </button>
           </div>
         </form>

@@ -86,6 +86,7 @@ const handleFileUpload = async (files: FileList | null) => {
   uploadProgress.value = 'Uploading file...'
 
   try {
+    let uploadedCount = 0
     for (let i = 0; i < files.length; i++) {
       const file = files[i]
 
@@ -115,10 +116,13 @@ const handleFileUpload = async (files: FileList | null) => {
           sort_order: images.value.length + 1,
           published: true
         })
+        uploadedCount++
       }
     }
 
-    showToast('Photo(s) uploaded successfully! Click "Save Gallery" to publish.', 'success')
+    if (uploadedCount > 0) {
+      showToast(`${uploadedCount} photo${uploadedCount === 1 ? '' : 's'} uploaded. Click "Save Gallery" to publish.`, 'success')
+    }
   } catch (err: any) {
     showToast(err?.statusMessage || 'Upload failed. Ensure image is < 5MB.', 'error')
   } finally {

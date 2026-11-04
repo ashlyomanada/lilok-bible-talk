@@ -23,12 +23,15 @@ const { toasts, removeToast } = useToast()
             ? 'bg-navy-900/95 border-accent-500/40 text-white'
             : toast.type === 'warning'
             ? 'bg-coral-900/95 border-coral-500/40 text-white'
+            : toast.type === 'error'
+            ? 'bg-red-950/95 border-red-500/40 text-white'
             : 'bg-navy-900/95 border-white/20 text-white'
         ]"
       >
         <div class="flex items-center gap-2.5">
           <span v-if="toast.type === 'success'" class="w-2 h-2 rounded-full bg-accent-400 animate-pulse"></span>
           <span v-else-if="toast.type === 'warning'" class="w-2 h-2 rounded-full bg-coral-400 animate-pulse"></span>
+          <span v-else-if="toast.type === 'error'" class="w-2 h-2 rounded-full bg-red-400 animate-pulse"></span>
           <span v-else class="w-2 h-2 rounded-full bg-white animate-pulse"></span>
           <span>{{ toast.text }}</span>
         </div>

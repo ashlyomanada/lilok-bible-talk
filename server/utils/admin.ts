@@ -1,4 +1,6 @@
 import type { H3Event } from 'h3'
+import { createError, deleteCookie, getCookie, setCookie } from 'h3'
+import { createHmac, timingSafeEqual } from 'node:crypto'
 import { createClient } from '@supabase/supabase-js'
 
 // Simple in-memory rate limiter for failed login attempts and mutations
@@ -78,6 +80,55 @@ export function getSupabaseAdmin() {
   }
 
   return createClient(supabaseUrl, supabaseServiceKey)
+}
+
+function getAdminSessionSecret() {
+  return process.env.ADMIN_SESSION_SECRET
+    || process.env.NUXT_SUPABASE_SECRET_KEY
+    || process.env.SUPABASE_SERVICE_KEY
+    || process.env.SUPABASE_SERVICE_ROLE_KEY
+    || process.env.ADMIN_PASSWORD
+}
+
+export function setAdminApiSession(event: H3Event, user: { role: string; [key: string]: unknown }) {
+  const secret = getAdminSessionSecret()
+  if (!secret) {
+    throw createError({ statusCode: 503, statusMessage: 'Server-side admin session signing is not configured.' })
+  }
+
+  const payload = Buffer.from(JSON.stringify(user)).toString('base64url')
+  const signature = createHmac('sha256', secret).update(payload).digest('base64url')
+  setCookie(event, 'lilok_admin_api_session', `${payload}.${signature}`, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    path: '/',
+    maxAge: 60 * 60 * 24 * 7
+  })
+}
+
+export function clearAdminApiSession(event: H3Event) {
+  deleteCookie(event, 'lilok_admin_api_session', { path: '/' })
+}
+
+export function requireAdminSession(event: H3Event) {
+  const sessionCookie = getCookie(event, 'lilok_admin_api_session')
+  const secret = getAdminSessionSecret()
+  try {
+    if (sessionCookie && secret) {
+      const [payload, signature] = sessionCookie.split('.')
+      if (payload && signature) {
+        const expected = createHmac('sha256', secret).update(payload).digest()
+        const received = Buffer.from(signature, 'base64url')
+        if (expected.length === received.length && timingSafeEqual(expected, received)) {
+          const user = JSON.parse(Buffer.from(payload, 'base64url').toString())
+          if (user?.role === 'admin') return user
+        }
+      }
+    }
+  } catch {}
+
+  throw createError({ statusCode: 401, statusMessage: 'Administrator sign-in is required.' })
 }
 
 // In-memory content cache for local changes if Supabase is offline
