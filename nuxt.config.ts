@@ -7,12 +7,27 @@ export default defineNuxtConfig({
   devtools: { enabled: false },
 
   modules: [
-    '@nuxtjs/tailwindcss'
+    '@nuxtjs/supabase',
+    '@nuxt/ui'
   ],
+
+  ui: {
+    fonts: false
+  },
+
+  supabase: {
+    redirect: false
+  },
 
   css: [
     '~/assets/css/main.css'
   ],
+
+  routeRules: {
+    '/': { swr: 60 },
+    '/admin/**': { ssr: false, headers: { 'X-Robots-Tag': 'noindex, nofollow' } },
+    '/api/**': { cors: true }
+  },
 
   app: {
     head: {
@@ -43,14 +58,9 @@ export default defineNuxtConfig({
         { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' },
         { rel: 'icon', type: 'image/png', href: '/images/mnl-logo.png' },
         { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
-        { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' }
+        { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' },
+        { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap' }
       ]
-    }
-  },
-
-  nitro: {
-    prerender: {
-      routes: ['/']
     }
   }
 })

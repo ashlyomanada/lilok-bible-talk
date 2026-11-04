@@ -1,154 +1,167 @@
-# 🕊️ Bible Talk Event Invitation Website
+# 🕊️ Lilok Bible Talk — CMS & Invitation Website
 
-A warm, uplifting, mobile-first single-page invitation website for a church Bible Talk event. Built with **Nuxt 3 (Vue 3, `<script setup>`)** and **Tailwind CSS**. Fully static with zero backend dependencies, designed to load fast and look stunning when opened from shared links on mobile devices and desktop browsers.
+A warm, uplifting, mobile-first single-page invitation website and Content Management System (CMS) for **Lilok Bible Talk** (Manila International Christian Church).
 
----
-
-## ✨ Features & Highlights
-
-- **Aesthetic**: Warm ivory, gold, sunrise gradients, and Cormorant Garamond serif headings paired with clean sans-serif typography.
-- **Mobile-First & Fully Responsive**: Optimized for phones (cleanly stacking chips, tap targets, mobile drawer menu).
-- **Subtle Motion & Accessibility**: Smooth scroll transitions, hover micro-interactions, and respects `prefers-reduced-motion`.
-- **Single Config File**: Edit church name, title, date, time, venue, speaker, contact, and scripture in one place (`config/event.ts`).
-- **Interactive Calendar Actions**: One-click Google Calendar integration and native `.ics` file generation for Apple Calendar & Outlook.
-- **Photo Gallery & Lightbox**: 6 curated photo placeholders with full keyboard and touch-friendly lightbox modal.
-- **Social Sharing**: Native Web Share API integration (`navigator.share`) with automatic clipboard fallback and copy notifications.
-- **Upload Component (UI-ready)**: Drag-and-drop zone with instant local photo preview, name/testimony inputs, and friendly "Coming soon" notice with clean `TODO` hooks for future backend integration.
-- **Static Generation (`nuxt generate`)**: Compiles to pure static HTML/CSS/JS in `.output/public/`, deployable anywhere (Vercel, Netlify, Cloudflare Pages, GitHub Pages).
+Built with **Nuxt 4 (Vue 3, `<script setup>`)**, **Tailwind CSS**, and **Supabase (PostgreSQL, Auth, Storage)**. Hybrid-rendered with 60-second SWR caching for ultra-fast global load times and instantaneous live updates via the secure `/admin` console.
 
 ---
 
-## 🚀 Quick Start
+## 🌟 Highlights & Architecture
 
-### 1. Install Dependencies
+- **Full In-Place CMS (`/admin`)**: Edit event schedule, title, venue, countdown, Scripture highlight, bento expectation cards, photo gallery, Sunday worship regional locations, contact channels, announcements, and global SEO meta tags without modifying code or redeploying.
+- **Instant Fallback Guarantee**: If Supabase is unconfigured, unreachable, or in development mode, the site seamlessly renders using `config/event.ts` seed defaults. It **never** displays a blank or broken page.
+- **Hybrid Rendering (`swr: 60`)**: The public landing page (`/`) serves lightning-fast cached HTML regenerated every 60 seconds (or immediately purged on demand via `/api/revalidate`), while the admin portal (`/admin/**`) runs as a protected Single-Page App with `X-Robots-Tag: noindex, nofollow`.
+- **Row Level Security (RLS)**: Public anonymous visitors can only read published rows. All mutations and storage management require authenticated administrative credentials (`profiles.role = 'admin'`).
+- **Dynamic Recurring Schedule**: Automatically computes the upcoming Thursday gathering in `Asia/Manila` (UTC+08:00) with countdown clocks, Google Calendar links, and native `.ics` file generation.
+- **Direct Media Storage**: Drag-and-drop image uploads with automatic MIME verification, 5 MB file size checks, and unique UUID naming stored directly in the `site-media` bucket.
+
+---
+
+## 🚀 Quick Setup & Local Development
+
+### 1. Prerequisites
+- **Bun** (recommended) or **Node.js** (v22+)
+- A **Supabase** account (Free tier or higher)
+
+### 2. Install Dependencies
 ```bash
-npm install --legacy-peer-deps
+bun install
 ```
 
-### 2. Start Local Development Server
+### 3. Environment Variables
+Copy `.env.example` to `.env`:
 ```bash
-npm run dev
+cp .env.example .env
 ```
-Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-### 3. Generate Static Production Build
-```bash
-npm run generate
+Fill in your Supabase project keys in `.env`:
+```ini
+# Supabase Public Configuration (Accessible to client)
+SUPABASE_URL="https://your-project.supabase.co"
+SUPABASE_KEY="your-anon-public-key"
+
+# Server-Only Configuration (Never leaked to client bundle)
+SUPABASE_SERVICE_ROLE_KEY="your-service-role-key"
+
+# Local Admin Fallback (Optional, for offline development)
+ADMIN_DEFAULT_EMAIL="admin@micc.church"
+ADMIN_DEFAULT_PASSWORD="YourSecurePasswordHere!"
 ```
-The production-ready static files are placed in `.output/public`.
 
-### 4. Preview the Static Build
+> [!CAUTION]
+> Never commit `.env` or your `SUPABASE_SERVICE_ROLE_KEY` to GitHub. The service role key bypasses PostgreSQL Row Level Security and must only be stored in your server environment variables or hosting dashboard.
+
+---
+
+## 🗄️ Database Setup & Migration
+
+### 1. Run Database Migrations
+You can apply the complete database schema and storage policies via the Supabase Dashboard SQL Editor or Supabase CLI:
+
+**Option A — Supabase SQL Editor:**
+1. Open your Supabase Dashboard -> **SQL Editor**.
+2. Open [`supabase/migrations/20261103000001_initial_schema.sql`](file:///Users/ccci/Project/lilok-bible-talk/supabase/migrations/20261103000001_initial_schema.sql).
+3. Paste the contents and click **Run**. This creates:
+   - 12 PostgreSQL tables (`site_settings`, `event_data`, `sections`, `expect_cards`, `verse`, `gallery_images`, `sunday_service`, `sunday_venues`, `contacts_social`, `announcements`, `profiles`, `activity_logs`).
+   - Row Level Security policies for read-only anon access and full admin access.
+   - The public storage bucket `site-media` for photo uploads.
+
+### 2. Seed Initial Content
+Load the existing church event details, photos, and configurations into the database:
 ```bash
-npx serve .output/public
+bun run seed
+```
+
+### 3. Create the First Admin Account
+Provision your first authorized administrator:
+```bash
+bun run create-admin admin@micc.church "YourSecurePassword!" "Lilok Administrator"
+```
+Or run interactively:
+```bash
+bun run create-admin
+```
+
+---
+
+## 💻 Running the App
+
+### Start Development Server
+```bash
+bun run dev
+```
+- Public Landing Page: [http://localhost:3000](http://localhost:3000)
+- Admin Console: [http://localhost:3000/admin](http://localhost:3000/admin)
+
+### Production Build
+```bash
+bun run build
+```
+
+### Test Production Server Locally
+```bash
+bun run preview
 # or
-npm run preview
+node .output/server/index.mjs
 ```
 
 ---
 
-## 📝 How to Customize Event Details
+## ☁️ Deployment Guide
 
-All event data is centralized in [`config/event.ts`](file:///Users/ccci/Desktop/Project/config/event.ts). 
+### Vercel Deployment
+1. Connect your GitHub repository to [Vercel](https://vercel.com).
+2. Framework Preset: **Nuxt.js** (automatically detected).
+3. Build Command: `bun run build` (or `npm run build`).
+4. Output Directory: Default (`.output`).
+5. Configure Environment Variables in the Vercel Project Settings:
+   - `SUPABASE_URL`
+   - `SUPABASE_KEY`
+   - `SUPABASE_SERVICE_ROLE_KEY`
+   - `ADMIN_DEFAULT_EMAIL`
+   - `ADMIN_DEFAULT_PASSWORD`
+6. Deploy. Vercel automatically deploys Nitro serverless functions for hybrid rendering and API routes.
 
-Open [`config/event.ts`](file:///Users/ccci/Desktop/Project/config/event.ts) and modify any of the constants:
-
-```typescript
-export const eventConfig = {
-  churchName: 'Grace Community Church',
-  churchTagline: 'A community where grace is found and hope is renewed',
-
-  eventTitle: 'Bible Talk: Finding Hope in Hard Times',
-  eventSubtitle: 'An evening of warm fellowship, uplifting scripture...',
-  oneLineWelcome: 'No matter where you are in your journey, you are warmly invited.',
-
-  date: 'Saturday, November 14, 2026',
-  time: '6:30 PM – 8:30 PM (Doors open 6:00 PM)',
-
-  venue: {
-    name: 'Grace Fellowship Hall (Main Campus)',
-    room: 'The Garden Room (Ground Floor)',
-    address: '742 Evergreen Terrace',
-    cityStateZip: 'Springfield, OR 97477',
-    mapLink: 'https://maps.google.com/?q=...',
-    notes: 'Free on-site parking available behind the building.'
-  },
-
-  speaker: {
-    name: 'Pastor David Vance & Guest Panel',
-    title: 'Teaching Pastor & Community Chaplain',
-    bio: '...'
-  },
-
-  contact: {
-    phone: '+15552345678',
-    displayPhone: '(555) 234-5678',
-    email: 'hello@gracecommunity.org',
-    facebookPageUrl: 'https://facebook.com/...',
-    facebookPageName: 'facebook.com/GraceCommunityTalk'
-  },
-
-  verse: {
-    text: '“Come to me, all you who are weary and burdened, and I will give you rest...”',
-    reference: 'Matthew 11:28–29',
-    translation: 'NIV',
-    reflectionNote: 'Whatever weight you have been carrying this week...'
-  }
-}
-```
-
-Updating this file automatically updates the Hero, Navigation, Verse Card, Event Details, Calendar files, Share text, and Footer.
+### Netlify Deployment
+1. Connect repository in [Netlify](https://netlify.com).
+2. Build command: `bun run build`.
+3. Publish directory: `.output/public`.
+4. Add Netlify Nuxt plugin or set `NITRO_PRESET=netlify`.
+5. Add the same Environment Variables under **Site configuration > Environment variables**.
 
 ---
 
-## 🖼️ How to Swap Images with Your Own Church Photos
+## 📖 Content Editor Guide (For Church Staff & Leaders)
 
-All static photos reside in [`public/images/`](file:///Users/ccci/Desktop/Project/public/images/):
+Non-technical volunteers and church staff can update all content from any browser or phone:
 
-| File Path | Description | Recommended Dimensions |
-| :--- | :--- | :--- |
-| `public/images/hero.jpg` | Background image for Hero section | 1920 × 1080 px |
-| `public/images/welcome.jpg` | Warm welcoming community photo | 1200 × 800 px |
-| `public/images/gallery-1.jpg` | Open Bible / scripture study | 1000 × 750 px |
-| `public/images/gallery-2.jpg` | Acoustic worship / singing | 1000 × 750 px |
-| `public/images/gallery-3.jpg` | Friends enjoying coffee & fellowship | 1000 × 750 px |
-| `public/images/gallery-4.jpg` | Prayer & encouragement | 1000 × 750 px |
-| `public/images/gallery-5.jpg` | Sunrise / inspirational landscape | 1000 × 750 px |
-| `public/images/gallery-6.jpg` | Community dinner table gathering | 1000 × 750 px |
-| `public/images/og-image.jpg` | Social share preview card (Facebook/Messenger) | 1200 × 630 px |
+1. **Accessing the Console**: Navigate to `/admin` and log in with your credentials.
+2. **Event & Schedule (`/admin/event`)**:
+   - Change start or end times, venue address, or directions.
+   - Enter a special date override or cancellation notice if plans change due to weather or venue availability.
+   - The next session date and countdown timer automatically compute and update on the home page.
+3. **Photo Gallery (`/admin/gallery`)**:
+   - Drag and drop photos directly onto the upload zone (under 5 MB).
+   - Enter a descriptive alt text (e.g. "Warm welcome over coffee") and captions.
+   - Reorder images using the **↑** and **↓** arrows, or unpublish photos to hide them.
+4. **Top Announcement Bar (`/admin/announcements`)**:
+   - Switch on the announcement bar to show a banner across the top of the site.
+   - Set an optional button link (e.g. direct Messenger link or map directions).
+   - Set start and expiration dates for automated scheduling.
+5. **What to Expect (`/admin/expect-cards`)**:
+   - Add, edit, or reorder the bento grid cards explaining the gathering flow.
+6. **Publishing Changes**:
+   - Tap **Save** in the top-right corner of any editor page.
+   - Tap the **Preview Site** button at any time to open the public site in a new tab.
 
-To replace any photo, simply drop your church's JPG image into `public/images/` with the corresponding filename.
-
----
-
-## 🧩 Component Architecture
-
-- [`components/Navbar.vue`](file:///Users/ccci/Desktop/Project/components/Navbar.vue): Sticky navigation header with mobile drawer and smooth scrolling
-- [`components/Hero.vue`](file:///Users/ccci/Desktop/Project/components/Hero.vue): Full-screen hero with ambient warm gradient overlays, date/venue chips, and CTA
-- [`components/WarmWelcome.vue`](file:///Users/ccci/Desktop/Project/components/WarmWelcome.vue): Welcoming copy, reassurance badges, and warm photography
-- [`components/VerseCard.vue`](file:///Users/ccci/Desktop/Project/components/VerseCard.vue): Highlighted scripture quote card with large typography and copy action
-- [`components/ExpectCards.vue`](file:///Users/ccci/Desktop/Project/components/ExpectCards.vue): 4 cards detailing what to expect during the evening
-- [`components/EventDetails.vue`](file:///Users/ccci/Desktop/Project/components/EventDetails.vue): Date, time, venue, speaker bio, Google Calendar + .ics download, and Google Maps directions
-- [`components/Gallery.vue`](file:///Users/ccci/Desktop/Project/components/Gallery.vue): Responsive photo gallery with interactive, accessible Lightbox modal
-- [`components/ShareInvite.vue`](file:///Users/ccci/Desktop/Project/components/ShareInvite.vue): Web Share API invitation with clipboard copy fallback and direct WhatsApp / SMS buttons
-- [`components/UploadCard.vue`](file:///Users/ccci/Desktop/Project/components/UploadCard.vue): Polished drag-and-drop file upload UI with live photo preview and `TODO` comment for backend integration
-- [`components/Footer.vue`](file:///Users/ccci/Desktop/Project/components/Footer.vue): Church info, contact links, Romans 15:13 blessing line, and "See you there!" banner
-- [`components/ToastContainer.vue`](file:///Users/ccci/Desktop/Project/components/ToastContainer.vue): Global feedback toasts
-- [`utils/calendar.ts`](file:///Users/ccci/Desktop/Project/utils/calendar.ts): Google Calendar URL and native `.ics` generator
-- [`composables/useToast.ts`](file:///Users/ccci/Desktop/Project/composables/useToast.ts): Reactive toast notification manager
+For complete field specifications, character counts, and image dimensions, refer to [`CONTENT.md`](file:///Users/ccci/Project/lilok-bible-talk/CONTENT.md).
 
 ---
 
-## 🌐 Deploying to Static Hosting
+## 🛡️ Security Features
 
-### Netlify
-1. Connect repository or run `netlify deploy --dir=.output/public --prod`.
-2. Build command: `npm run generate`
-3. Publish directory: `.output/public`
-
-### Vercel
-1. Set Framework Preset to **Nuxt.js**.
-2. Build command: `npm run generate`
-3. Output directory: `.output/public`
-
-### GitHub Pages
-1. Push `.output/public` to `gh-pages` branch or configure GitHub Actions.
+- **Row Level Security (RLS)**: Enforced directly at the Postgres engine level.
+- **CSRF & Rate Limiting**: In-memory rate limiting throttles brute-force attempts on `/api/admin/auth/login`.
+- **Strict Disallow in Search Engines**: `/admin` and `/api/` are disallowed in `robots.txt` and protected by HTTP headers `X-Robots-Tag: noindex, nofollow`.
+- **Upload Restrictions**: Server-side MIME validation allows only safe image formats (JPEG, PNG, WebP, GIF, SVG) up to 5 MB.
+- **Audit Logging**: All admin modifications, uploads, and deletions are recorded in `activity_logs`.

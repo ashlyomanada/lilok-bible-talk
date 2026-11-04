@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { eventConfig } from '~/config/event'
-import { getGoogleCalendarUrl, downloadIcsFile } from '~/utils/calendar'
+import { useSiteContent } from '~/composables/useSiteContent'
 import { useToast } from '~/composables/useToast'
 
+const { content, nextSession, googleCalendarUrl, downloadIcsFile } = useSiteContent()
 const { showToast } = useToast()
 const showCalendarMenu = ref(false)
 
@@ -39,12 +39,12 @@ const handleIcsDownload = () => {
           <div class="flex items-center gap-3">
             <img
               src="/images/mnl-logo-white.png"
-              :alt="eventConfig.logoAlt"
+              :alt="content.siteSettings.logoAlt"
               class="h-7 w-auto object-contain"
             />
             <div>
-              <p class="font-black text-sm uppercase tracking-wider text-white">{{ eventConfig.groupName }}</p>
-              <p class="text-[11px] text-surface-300">{{ eventConfig.parentChurchName }} · {{ eventConfig.parentRegion }}</p>
+              <p class="font-black text-sm uppercase tracking-wider text-white">{{ content.siteSettings.groupName }}</p>
+              <p class="text-[11px] text-surface-300">{{ content.siteSettings.parentChurchName }} · {{ content.siteSettings.parentRegion }}</p>
             </div>
           </div>
           <span class="px-3.5 py-1 rounded-full text-xs font-black uppercase tracking-widest bg-accent-500 text-navy-950 shadow-soft-sm">
@@ -60,10 +60,10 @@ const handleIcsDownload = () => {
               Bible Talk Theme
             </span>
             <h3 class="font-sans font-black text-3xl sm:text-4xl uppercase tracking-tight text-navy-900">
-              "{{ eventConfig.eventTitle }}"
+              "{{ content.event.title }}"
             </h3>
             <p class="text-sm text-navy-700 mt-2 font-normal leading-relaxed">
-              {{ eventConfig.oneLineWelcome }} Doors open at {{ eventConfig.doorsOpenTime }}.
+              {{ content.event.oneLineWelcome }} Doors open at {{ content.event.doorsOpenTime }}.
             </p>
           </div>
 
@@ -79,12 +79,12 @@ const handleIcsDownload = () => {
               <div>
                 <span class="text-xs font-black uppercase tracking-wider text-accent-700 block mb-1">When</span>
                 <h4 class="font-sans font-black text-xl sm:text-2xl uppercase tracking-tight text-navy-900 mb-1">
-                  {{ eventConfig.date }}
+                  {{ nextSession.dateLabel }}
                 </h4>
                 <p class="text-sm text-navy-700 font-semibold">
-                  {{ eventConfig.time }}
+                  {{ nextSession.timeLabel }}
                 </p>
-                <p class="text-xs text-navy-500 mt-1">Doors open {{ eventConfig.doorsOpenTime }} for snacks</p>
+                <p class="text-xs text-navy-500 mt-1">Doors open {{ content.event.doorsOpenTime }} for snacks</p>
               </div>
             </div>
 
@@ -99,13 +99,13 @@ const handleIcsDownload = () => {
               <div>
                 <span class="text-xs font-black uppercase tracking-wider text-coral-600 block mb-1">Where</span>
                 <h4 class="font-sans font-black text-xl sm:text-2xl uppercase tracking-tight text-navy-900 mb-1">
-                  {{ eventConfig.venue.name }}
+                  {{ content.event.venue.name }}
                 </h4>
                 <p class="text-sm text-navy-800 font-semibold mb-1">
-                  {{ eventConfig.venue.room }}
+                  {{ content.event.venue.room }}
                 </p>
                 <p class="text-xs text-navy-600">
-                  {{ eventConfig.venue.address }} · {{ eventConfig.venue.cityStateZip }}
+                  {{ content.event.venue.address }} · {{ content.event.venue.cityStateZip }}
                 </p>
               </div>
             </div>
@@ -118,15 +118,15 @@ const handleIcsDownload = () => {
             </div>
             <div>
               <span class="text-xs font-black uppercase tracking-wider text-navy-500 block mb-0.5">Speaker / Discussion Leaders</span>
-              <p class="font-black text-navy-900 text-base uppercase">{{ eventConfig.speaker.name }}</p>
-              <p class="text-xs text-accent-700 font-bold mb-1">{{ eventConfig.speaker.title }}</p>
-              <p class="text-xs text-navy-700 leading-relaxed font-normal">{{ eventConfig.speaker.bio }}</p>
+              <p class="font-black text-navy-900 text-base uppercase">{{ content.event.speaker.name }}</p>
+              <p class="text-xs text-accent-700 font-bold mb-1">{{ content.event.speaker.title }}</p>
+              <p class="text-xs text-navy-700 leading-relaxed font-normal">{{ content.event.speaker.bio }}</p>
             </div>
           </div>
 
           <!-- Directions Note -->
           <div class="p-4 rounded-2xl bg-surface-100 border border-surface-200 text-xs text-navy-800 leading-relaxed">
-            <strong class="font-black text-navy-900 uppercase tracking-wide">Landmark & Directions:</strong> {{ eventConfig.venue.notes }}
+            <strong class="font-black text-navy-900 uppercase tracking-wide">Landmark & Directions:</strong> {{ content.event.venue.notes }}
           </div>
         </div>
 
@@ -144,7 +144,7 @@ const handleIcsDownload = () => {
             <div class="flex items-center gap-2">
               <!-- Add to Google Calendar -->
               <a
-                :href="getGoogleCalendarUrl()"
+                :href="googleCalendarUrl"
                 target="_blank"
                 rel="noopener noreferrer"
                 class="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-navy-900 hover:bg-navy-800 text-white font-black text-xs sm:text-sm uppercase tracking-wider shadow-soft active:scale-95 transition-all"
@@ -172,7 +172,7 @@ const handleIcsDownload = () => {
           <!-- Get Directions Button -->
           <div class="flex items-center gap-3">
             <a
-              :href="eventConfig.venue.mapLink"
+              :href="content.event.venue.mapLink"
               target="_blank"
               rel="noopener noreferrer"
               class="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-white hover:bg-surface-100 text-navy-900 font-black text-xs sm:text-sm uppercase tracking-wider border border-surface-300 shadow-soft-sm active:scale-95 transition-all"
@@ -186,7 +186,7 @@ const handleIcsDownload = () => {
 
             <!-- RSVP Quick Messenger Link -->
             <a
-              :href="eventConfig.contact.messengerUrl"
+              :href="content.contacts.messengerUrl"
               target="_blank"
               rel="noopener noreferrer"
               class="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-accent-500 hover:bg-accent-600 text-navy-950 font-black text-xs sm:text-sm uppercase tracking-wider shadow-soft hover:shadow-glow-gold active:scale-95 transition-all"

@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { eventConfig } from '~/config/event'
+import { useSiteContent } from '~/composables/useSiteContent'
 import { useToast } from '~/composables/useToast'
 
+const { content } = useSiteContent()
 const { showToast } = useToast()
 
 const copyVerse = async () => {
-  const fullText = `${eventConfig.verse.text} — ${eventConfig.verse.reference} (${eventConfig.verse.translation})`
+  const fullText = `${content.value.verse.text} — ${content.value.verse.reference} (${content.value.verse.translation})`
   try {
     if (navigator?.clipboard?.writeText) {
       await navigator.clipboard.writeText(fullText)
@@ -38,18 +39,18 @@ const copyVerse = async () => {
       <!-- Giant Uppercase Verse Quote -->
       <blockquote class="max-w-5xl mx-auto mb-10">
         <p class="font-sans font-black text-3xl sm:text-5xl md:text-6xl lg:text-7xl uppercase tracking-tight text-white leading-[1.08] drop-shadow-sm">
-          {{ eventConfig.verse.text }}
+          {{ content.verse.text }}
         </p>
       </blockquote>
 
       <!-- Reference in Accent Color & Translation -->
       <div class="flex flex-col sm:flex-row items-center justify-center gap-3.5 mb-10">
         <span class="font-sans font-black text-2xl sm:text-3xl uppercase tracking-wider text-accent-400 drop-shadow-xs">
-          {{ eventConfig.verse.reference }}
+          {{ content.verse.reference }}
         </span>
         <span class="hidden sm:inline text-white/30">•</span>
         <span class="px-3 py-1 rounded-full text-xs font-black uppercase tracking-widest bg-white/15 text-white/90 border border-white/20">
-          {{ eventConfig.verse.translation }}
+          {{ content.verse.translation }}
         </span>
       </div>
 
@@ -58,7 +59,7 @@ const copyVerse = async () => {
         <div class="flex items-start gap-3">
           <span class="text-accent-400 text-lg leading-none mt-0.5">✦</span>
           <p class="text-xs sm:text-sm text-surface-200 leading-relaxed font-normal">
-            {{ eventConfig.verse.reflectionNote }}
+            {{ content.verse.reflectionNote }}
           </p>
         </div>
 

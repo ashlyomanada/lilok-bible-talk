@@ -1,40 +1,43 @@
 <script setup lang="ts">
-import { eventConfig } from '~/config/event'
+import { computed } from 'vue'
+import { useSiteContent } from '~/composables/useSiteContent'
 
-const connectRows = [
+const { content } = useSiteContent()
+
+const connectRows = computed(() => [
   {
     title: 'Messenger',
     handle: 'm.me/manilaicc',
     description: 'Chat with us directly for personal Bible studies, prayer requests, or rideshares.',
-    url: eventConfig.contact.messengerUrl,
+    url: content.value.contacts.messengerUrl,
     badge: 'Fastest Response',
     icon: 'messenger'
   },
   {
     title: 'Instagram',
-    handle: eventConfig.instagramHandle,
+    handle: content.value.contacts.instagramHandle,
     description: 'Stories, weekly discipleship moments, gathering spots, and photo recaps.',
-    url: eventConfig.instagramUrl,
+    url: content.value.contacts.instagramUrl,
     badge: 'Community',
     icon: 'instagram'
   },
   {
     title: 'Facebook',
-    handle: eventConfig.contact.facebookPageName,
+    handle: content.value.contacts.facebookPageName,
     description: 'Metro Manila International Christian Church official community updates and announcements.',
-    url: eventConfig.contact.facebookUrl,
+    url: content.value.contacts.facebookUrl,
     badge: 'Church Updates',
     icon: 'facebook'
   },
   {
     title: 'YouTube',
-    handle: eventConfig.contact.youtubeHandle,
+    handle: content.value.contacts.youtubeHandle,
     description: 'Watch full Sunday worship sermons, life-changing baptisms, and discipleship teachings.',
-    url: eventConfig.contact.youtubeUrl,
+    url: content.value.contacts.youtubeUrl,
     badge: 'Sermons & Faith',
     icon: 'youtube'
   }
-]
+])
 </script>
 
 <template>
@@ -53,7 +56,7 @@ const connectRows = [
           Connect With Us
         </h2>
         <p class="text-surface-300 text-base sm:text-lg font-normal leading-relaxed max-w-2xl">
-          {{ eventConfig.connectCopy }}
+          {{ content.contacts.connectCopy }}
         </p>
       </div>
 

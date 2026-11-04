@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import { eventConfig } from '~/config/event'
+import { useSiteContent } from '~/composables/useSiteContent'
+
+const { content } = useSiteContent()
 
 const scrollToTop = () => {
   if (typeof window !== 'undefined') {
@@ -22,19 +24,19 @@ const scrollToTop = () => {
           <div class="flex items-center gap-4">
             <img
               src="/images/mnl-logo-white.png"
-              :alt="eventConfig.logoAlt"
+              :alt="content.siteSettings.logoAlt"
               class="h-12 sm:h-16 w-auto object-contain"
               loading="lazy"
             />
             <div class="border-l border-white/20 pl-4">
               <span class="font-sans font-black text-2xl uppercase tracking-tight text-white block">
-                {{ eventConfig.groupName }}
+                {{ content.siteSettings.groupName }}
               </span>
               <span class="text-xs text-accent-400 font-extrabold uppercase tracking-wider block">
-                {{ eventConfig.parentChurchName }}
+                {{ content.siteSettings.parentChurchName }}
               </span>
               <span class="text-[11px] text-surface-400 font-medium block">
-                {{ eventConfig.parentRegion }} · {{ eventConfig.soldOutBadge }}
+                {{ content.siteSettings.parentRegion }} · {{ content.siteSettings.soldOutBadge }}
               </span>
             </div>
           </div>
@@ -42,14 +44,14 @@ const scrollToTop = () => {
           <!-- Blessing Line & Tagline -->
           <div class="p-6 rounded-3xl bg-navy-900/90 border border-white/10 text-surface-200 text-sm leading-relaxed max-w-lg space-y-3">
             <p class="font-sans font-black text-lg text-white uppercase tracking-tight">
-              "{{ eventConfig.tagline }}"
+              "{{ content.siteSettings.tagline }}"
             </p>
             <p class="text-xs text-surface-300 leading-relaxed font-normal">
-              May God bless and protect you and your loved ones this week. Wherever life finds you right now, remember that you have a seat at our table and brothers and sisters who care.
+              {{ content.siteSettings.footerBlessing || 'May God bless and protect you and your loved ones this week. Wherever life finds you right now, remember that you have a seat at our table and brothers and sisters who care.' }}
             </p>
             <div class="pt-2 flex items-center gap-2">
               <span class="px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-accent-500/15 text-accent-400 border border-accent-500/30">
-                {{ eventConfig.hashtag }}
+                {{ content.siteSettings.hashtag }}
               </span>
             </div>
           </div>
@@ -63,18 +65,18 @@ const scrollToTop = () => {
           <ul class="space-y-3 text-sm text-surface-300">
             <li>
               <a
-                :href="eventConfig.instagramUrl"
+                :href="content.contacts.instagramUrl"
                 target="_blank"
                 rel="noopener noreferrer"
                 class="hover:text-accent-400 transition-colors inline-flex items-center gap-2.5 font-bold"
               >
                 <span class="text-coral-400">✦</span>
-                <span>Instagram: {{ eventConfig.instagramHandle }}</span>
+                <span>Instagram: {{ content.contacts.instagramHandle }}</span>
               </a>
             </li>
             <li>
               <a
-                :href="eventConfig.contact.messengerUrl"
+                :href="content.contacts.messengerUrl"
                 target="_blank"
                 rel="noopener noreferrer"
                 class="hover:text-accent-400 transition-colors inline-flex items-center gap-2.5 font-bold"
@@ -85,7 +87,7 @@ const scrollToTop = () => {
             </li>
             <li>
               <a
-                :href="eventConfig.contact.facebookUrl"
+                :href="content.contacts.facebookUrl"
                 target="_blank"
                 rel="noopener noreferrer"
                 class="hover:text-accent-400 transition-colors inline-flex items-center gap-2.5 font-bold"
@@ -96,7 +98,7 @@ const scrollToTop = () => {
             </li>
             <li>
               <a
-                :href="eventConfig.contact.youtubeUrl"
+                :href="content.contacts.youtubeUrl"
                 target="_blank"
                 rel="noopener noreferrer"
                 class="hover:text-accent-400 transition-colors inline-flex items-center gap-2.5 font-bold"
@@ -112,16 +114,16 @@ const scrollToTop = () => {
         <div class="md:col-span-3 flex flex-col justify-between text-left space-y-4">
           <div class="p-5 rounded-3xl bg-navy-900/90 border border-white/10">
             <span class="text-[10px] font-black uppercase tracking-widest text-accent-400 block mb-1">
-              {{ eventConfig.sundayService.dayAndTime }}
+              {{ content.sunday.dayAndTime }}
             </span>
             <p class="font-sans font-black text-lg text-white uppercase tracking-tight mb-2">
               Sunday Worship
             </p>
             <p class="text-xs text-surface-300 leading-relaxed font-normal mb-3">
-              {{ eventConfig.sundayService.message }}
+              {{ content.sunday.message }}
             </p>
             <a
-              :href="eventConfig.sundayService.messengerUrl"
+              :href="content.sunday.messengerUrl"
               target="_blank"
               rel="noopener noreferrer"
               class="inline-flex items-center gap-1.5 text-xs font-black uppercase tracking-wider text-accent-400 hover:text-white transition-colors"
@@ -146,9 +148,9 @@ const scrollToTop = () => {
 
       <!-- Bottom Bar -->
       <div class="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-surface-400 font-medium">
-        <p>© 2026 {{ eventConfig.groupName }} · {{ eventConfig.parentChurchName }} ({{ eventConfig.parentRegion }})</p>
+        <p>© 2026 {{ content.siteSettings.groupName }} · {{ content.siteSettings.parentChurchName }} ({{ content.siteSettings.parentRegion }})</p>
         <p class="text-center sm:text-right">
-          {{ eventConfig.hashtag }} · {{ eventConfig.soldOutBadge }}
+          {{ content.siteSettings.hashtag }} · {{ content.siteSettings.soldOutBadge }}
         </p>
       </div>
     </div>

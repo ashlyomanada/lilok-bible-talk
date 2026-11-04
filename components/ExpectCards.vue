@@ -1,62 +1,7 @@
 <script setup lang="ts">
-import { eventConfig } from '~/config/event'
+import { useSiteContent } from '~/composables/useSiteContent'
 
-const bentoItems = [
-  {
-    id: 'come-as-you-are',
-    title: 'Come As You Are',
-    tagline: 'No dress codes, no expectations',
-    description: 'Wear whatever you feel comfortable in. Whether it is casual t-shirts and jeans or work attire, you are welcomed warmly just the way you are.',
-    icon: 'heart',
-    badge: 'Everyone Welcome',
-    span: 'col-span-1 md:col-span-2'
-  },
-  {
-    id: 'free',
-    title: '100% Free',
-    tagline: 'Always our guest',
-    description: 'No entrance fees, no hidden obligations, and no financial collections or tithes requested from our guests. Ever.',
-    icon: 'sparkles',
-    badge: 'Zero Cost',
-    span: 'col-span-1'
-  },
-  {
-    id: 'bring-friend',
-    title: 'Bring a Friend',
-    tagline: 'Faith is better together',
-    description: 'Invite your friends, campus classmates, colleagues, or family. The more, the merrier at our table!',
-    icon: 'users',
-    badge: 'Plus Ones Encouraged',
-    span: 'col-span-1'
-  },
-  {
-    id: 'food-fellowship',
-    title: 'Food & Fellowship',
-    tagline: 'Great food, great people',
-    description: 'Enjoy delicious refreshments, light snacks, coffee, and plenty of laughs and genuine conversation after our discussion.',
-    icon: 'coffee',
-    badge: 'Complimentary Treats',
-    span: 'col-span-1 md:col-span-2'
-  },
-  {
-    id: 'uplifting-message',
-    title: 'Uplifting Message',
-    tagline: 'Real answers for real life',
-    description: 'A practical, encouraging look at God’s Word tailored for everyday struggles, healing, purpose, and peace.',
-    icon: 'book',
-    badge: 'Practical Scripture',
-    span: 'col-span-1'
-  },
-  {
-    id: 'open-discussion',
-    title: 'Open Bible Discussion',
-    tagline: 'Ask questions freely',
-    description: 'A relaxed circle where curiosities, questions, and personal thoughts are valued and respectfully explored.',
-    icon: 'chat',
-    badge: 'Interactive',
-    span: 'col-span-1'
-  }
-]
+const { content } = useSiteContent()
 </script>
 
 <template>
@@ -77,15 +22,15 @@ const bentoItems = [
           What to Expect
         </h2>
         <p class="text-surface-300 text-base sm:text-lg font-normal leading-relaxed">
-          No awkward surprises or speeches. Here is what you can look forward to at Lilok Bible Talk:
+          No awkward surprises or speeches. Here is what you can look forward to at {{ content.siteSettings.groupName }}:
         </p>
       </div>
 
       <!-- Bento-style Grid in Navy & Gray Tones -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-5 lg:gap-6">
         <div
-          v-for="item in bentoItems"
-          :key="item.id"
+          v-for="item in content.expectCards"
+          :key="item.id || item.cardId"
           class="group relative rounded-3xl p-7 sm:p-8 bg-navy-850/80 hover:bg-navy-800 border border-white/10 hover:border-accent-500/40 shadow-soft transition-all duration-300 flex flex-col justify-between"
           :class="item.span"
         >
@@ -110,16 +55,16 @@ const bentoItems = [
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M18 8h1a4 4 0 010 8h-1M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8zM6 1v3M10 1v3M14 1v3"/>
                 </svg>
                 <!-- Book -->
-                <svg v-else-if="item.icon === 'book'" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg v-else-if="item.icon === 'book' || item.icon === 'book-open'" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
                 </svg>
-                <!-- Chat -->
+                <!-- Chat / Messages -->
                 <svg v-else class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
                 </svg>
               </div>
 
-              <span class="px-3 py-1 rounded-full text-[11px] font-black uppercase tracking-wider bg-white/10 text-surface-200 border border-white/15">
+              <span v-if="item.badge" class="px-3 py-1 rounded-full text-[11px] font-black uppercase tracking-wider bg-white/10 text-surface-200 border border-white/15">
                 {{ item.badge }}
               </span>
             </div>
@@ -137,7 +82,7 @@ const bentoItems = [
           </div>
 
           <div class="mt-6 pt-4 border-t border-white/10 flex items-center justify-between text-xs font-black uppercase tracking-widest text-surface-400 group-hover:text-accent-400 transition-colors">
-            <span>{{ eventConfig.groupName }}</span>
+            <span>{{ content.siteSettings.groupName }}</span>
             <span class="transform group-hover:translate-x-1 transition-transform">→</span>
           </div>
         </div>
